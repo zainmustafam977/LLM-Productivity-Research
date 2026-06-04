@@ -496,7 +496,7 @@ function setupConditionLegend() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 14. Stat Card Tooltips (Enhancement 4)
+// 14. Card Tooltips & Verdicts (Enhancement 4)
 // ────────────────────────────────────────────────────────────
 function setupStatTooltips() {
     const tooltips = {
@@ -514,6 +514,16 @@ function setupStatTooltips() {
         card.setAttribute('title', text);
         card.setAttribute('aria-label', text);
         card.style.cursor = 'help';
+    });
+
+    // Add generic verdict tooltips to info cards
+    document.querySelectorAll('.info-card, .finding-card').forEach(card => {
+        if (!card.hasAttribute('title')) {
+            const heading = card.querySelector('h3, h4');
+            if (heading) {
+                card.setAttribute('title', `Verdict: Key insight regarding ${heading.textContent.trim()}`);
+            }
+        }
     });
 }
 
