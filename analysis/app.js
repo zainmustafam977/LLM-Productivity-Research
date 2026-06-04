@@ -25,48 +25,58 @@ function animateCounter(id, target, duration) {
 }
 
 // ────────────────────────────────────────────────────────────
-// 3. Scroll-Triggered Animations (enter + exit)
+// 3. Scroll-Triggered Animations (bidirectional, varied)
 // ────────────────────────────────────────────────────────────
 function setupScrollAnimations() {
     try {
-        const ANIM_TYPES = ['anim-slide-up', 'anim-slide-left', 'anim-slide-right', 'anim-scale-in', 'anim-fade'];
-        let animIndex = 0;
+        const animClasses = ['anim-slide-up', 'anim-slide-left', 'anim-slide-right', 'anim-scale-in', 'anim-fade'];
 
         // Sections get slide-up
-        document.querySelectorAll('.section').forEach(el => {
+        document.querySelectorAll('.section-header').forEach(el => {
             el.classList.add('anim-slide-up');
         });
 
         // Chart cards get varied animations
         document.querySelectorAll('.chart-card').forEach((el, i) => {
-            const type = i % 2 === 0 ? 'anim-slide-left' : 'anim-slide-right';
-            el.classList.add(type);
+            el.classList.add(animClasses[i % animClasses.length]);
         });
 
-        // Info cards scale in
-        document.querySelectorAll('.info-card').forEach(el => {
-            el.classList.add('anim-scale-in');
-        });
-
-        // Finding cards alternate
-        document.querySelectorAll('.finding-card').forEach((el, i) => {
+        // Info cards alternate left/right
+        document.querySelectorAll('.info-card').forEach((el, i) => {
             el.classList.add(i % 2 === 0 ? 'anim-slide-left' : 'anim-slide-right');
         });
 
-        // Quote cards fade in
+        // Finding cards scale in
+        document.querySelectorAll('.finding-card').forEach(el => {
+            el.classList.add('anim-scale-in');
+        });
+
+        // Quote cards fade
         document.querySelectorAll('.quote-card').forEach(el => {
             el.classList.add('anim-fade');
         });
 
-        // Summary/team cards scale
-        document.querySelectorAll('.summary-card, .team-card').forEach(el => {
+        // Summary cards scale
+        document.querySelectorAll('.summary-card').forEach(el => {
             el.classList.add('anim-scale-in');
         });
 
-        // Single observer for ALL animated elements — trigger on enter AND exit
+        // Team cards slide up
+        document.querySelectorAll('.team-card').forEach(el => {
+            el.classList.add('anim-slide-up');
+        });
+
+        // Condition cards
+        document.querySelectorAll('.condition').forEach((el, i) => {
+            el.classList.add('anim-slide-up');
+            el.style.transitionDelay = `${i * 80}ms`;
+        });
+
+        // Bidirectional observer — adds 'visible' on enter, removes on exit
         const allAnimated = document.querySelectorAll(
             '.anim-slide-up, .anim-slide-left, .anim-slide-right, .anim-scale-in, .anim-fade'
         );
+        if (!allAnimated.length) return;
 
         const observer = new IntersectionObserver(
             (entries) => {
@@ -74,12 +84,12 @@ function setupScrollAnimations() {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
                     } else {
-                        // Remove visible when scrolling OUT so it re-animates on return
+                        // Remove visible when scrolling OUT — bidirectional
                         entry.target.classList.remove('visible');
                     }
                 });
             },
-            { threshold: 0.06, rootMargin: '0px 0px -60px 0px' }
+            { threshold: 0.05, rootMargin: '0px 0px -60px 0px' }
         );
 
         allAnimated.forEach(el => observer.observe(el));
@@ -165,13 +175,13 @@ function setupHamburger() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 6. Theme Toggle — Light theme is the DEFAULT
+// 6. Dark Mode Toggle
 // ────────────────────────────────────────────────────────────
 function setupThemeToggle() {
     const toggle = document.getElementById('themeToggle');
     if (!toggle) return;
 
-    // Light theme is always the default unless user explicitly chose dark
+    // Default to light theme — only use dark if explicitly saved
     const savedTheme = localStorage.getItem('theme');
     const initialTheme = savedTheme || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
@@ -185,24 +195,24 @@ function setupThemeToggle() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 7. Reading Progress Bar — smooth RAF-based
+// 7. Reading Progress Bar (smooth rAF-based)
 // ────────────────────────────────────────────────────────────
 function setupProgressBar() {
     const bar = document.getElementById('progressBar');
     if (!bar) return;
 
     let ticking = false;
-    function updateProgress() {
-        const winScroll = document.documentElement.scrollTop;
-        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = height > 0 ? winScroll / height : 0;
-        bar.style.transform = `scaleX(${scrolled})`;
+    function updateBar() {
+        const winScroll = window.scrollY || document.documentElement.scrollTop;
+        const docHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const progress = docHeight > 0 ? winScroll / docHeight : 0;
+        bar.style.transform = `scaleX(${progress})`;
         ticking = false;
     }
 
     window.addEventListener('scroll', () => {
         if (!ticking) {
-            requestAnimationFrame(updateProgress);
+            requestAnimationFrame(updateBar);
             ticking = true;
         }
     }, { passive: true });
@@ -385,7 +395,23 @@ function populateQuotes() {
             container.appendChild(card);
         });
 
-        // Note: quote-card animations are handled by setupScrollAnimations() via anim-fade class
+        // Observe newly created quote cards for fade-in animation
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+        );
+
+        container.querySelectorAll('.quote-card').forEach(card => {
+            card.classList.add('fade-in-section');
+            observer.observe(card);
+        });
     } catch (err) {
         console.warn('populateQuotes:', err);
     }
@@ -508,88 +534,7 @@ function scrollToHashOnLoad() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 16. Apply Text Hover Effect to all headings & descriptions
-// ────────────────────────────────────────────────────────────
-function setupTextHoverEffects() {
-    const targets = document.querySelectorAll(
-        '.section-header h2, .section-desc, .subhead, .info-card h3, .chart-card h3, .finding-card h4, .summary-card h3, .team-card h3, .footer p'
-    );
-    targets.forEach(el => {
-        el.classList.add('text-hover-target');
-    });
-}
-
-// ────────────────────────────────────────────────────────────
-// 17. Inject Chart Verdicts (one-line captions below each chart)
-// ────────────────────────────────────────────────────────────
-function injectChartVerdicts() {
-    const verdicts = {
-        chartGender: 'Study sample is <strong>83% male</strong>, reflecting the broader CS student demographic.',
-        chartEducation: 'Bachelor-level students dominate — a <strong>homogeneous educational cohort</strong>.',
-        chartAge: 'Concentrated 20–25 age range ensures <strong>minimal age confounds</strong>.',
-        chartExperience: 'Strong Python skills, moderate AI tool familiarity — <strong>balanced baseline</strong>.',
-        chartProgExpDist: 'Experience spans 0–100% — adequate <strong>variance for correlation analysis</strong>.',
-        chartToolFamiliarity: 'VSCode expertise is high; Copilot/ChatGPT exposure varies <strong>widely</strong>.',
-        chartSpeedCondition: '<strong>Autocomplete wins decisively</strong> — 78% faster than the control baseline.',
-        chartSpeedBox: 'Autocomplete has a <strong>tight, high-performing distribution</strong> vs. wide control spread.',
-        chartSpeedTaskCondition: 'AI advantage is <strong>consistent across all three task types</strong>.',
-        chartSpeedIndividual: 'Individual variance is high — <strong>some participants gain 3× from AI</strong>.',
-        chartQualityCorrect: 'More requirements implemented ≠ more errors — <strong>quality holds steady</strong>.',
-        chartMaintainability: '<strong>Negligible MI difference</strong> — AI does not degrade code quality (d = 0.12).',
-        chartAccuracy: 'Autocomplete achieves the <strong>highest correct-to-attempted ratio</strong>.',
-        chartQualityTask: 'Quality is <strong>task-dependent</strong> — PDF parsing shows the most variance.',
-        chartActivity: 'AI-assisted conditions generate <strong>significantly more output volume</strong>.',
-        chartActivityDist: 'Individual output spread <strong>widens dramatically</strong> with AI assistance.',
-        chartCommAI: 'Conversational AI drives <strong>3× more AI communication</strong> than autocomplete.',
-        chartCommBrowserVsAI: 'AI tools <strong>nearly eliminate Google/Stack Overflow dependency</strong>.',
-        chartCommSnippets: 'Conversational generates <strong>fewer but larger</strong> code suggestions.',
-        chartCommSnippetSize: 'Mean snippet size is <strong>4× larger in conversational</strong> mode.',
-        chartSatisfaction: 'Conversational AI achieves <strong>peak satisfaction</strong>; control frustrates users.',
-        chartPerceivedSpeed: 'Self-reported speed aligns with <strong>measured performance</strong> rankings.',
-        chartPerceivedQuality: 'Perceived quality is <strong>surprisingly uniform</strong> across all conditions.',
-        chartIDESupport: 'AI-assisted IDEs score <strong>dramatically higher</strong> on perceived support.',
-        chartIDEUnderstanding: 'Conversational AI best helps users feel <strong>understood by the IDE</strong>.',
-        chartUXRadar: 'Conversational excels at <strong>exploration</strong>; autocomplete at <strong>flow</strong>.',
-        chartLOC: 'Autocomplete produces <strong>~40% more lines of code</strong> than manual coding.',
-        chartComments: 'Comment density is <strong>similar</strong> — AI doesn\'t suppress documentation.',
-        chartCodeCommentRatio: 'Code-to-comment ratio stays <strong>healthy across all conditions</strong>.',
-        chartCodePerTask: 'Output per task varies — <strong>CSV tasks benefit most</strong> from AI help.',
-        chartExpVsSpeed: 'Experience has <strong>minimal correlation</strong> with AI-boosted speed gains.',
-        chartSpeedVsQuality: '<strong>No speed-quality tradeoff</strong> — faster developers write equally good code.',
-        chartActivityVsQuality: 'More output volume <strong>does not correlate</strong> with lower quality.',
-        chartPerceivedVsActual: 'Perceived speed <strong>closely mirrors</strong> actual measured performance.',
-        chartHeatmap: 'Strong <strong>speed-correctness correlation</strong>; quality metrics are independent.',
-        chartOverallRadar: 'Autocomplete leads on <strong>speed/efficiency</strong>; conversational on <strong>UX/satisfaction</strong>.',
-        chartPositiveThemes: '<strong>Learning and speed</strong> are the most frequently praised AI benefits.',
-        chartNegativeThemes: '<strong>Verbosity and over-reliance</strong> are the top concerns with AI tools.'
-    };
-
-    Object.entries(verdicts).forEach(([canvasId, html]) => {
-        const canvas = document.getElementById(canvasId);
-        if (!canvas) return;
-        const container = canvas.closest('.chart-container');
-        if (!container) return;
-        const verdict = document.createElement('p');
-        verdict.className = 'chart-verdict';
-        verdict.innerHTML = html;
-        container.after(verdict);
-    });
-}
-
-// ────────────────────────────────────────────────────────────
-// 18. Make charts interactive (pointer cursor + active element highlight)
-// ────────────────────────────────────────────────────────────
-function setupChartInteractivity() {
-    // Make all chart canvases show pointer cursor on hover
-    document.querySelectorAll('.chart-container canvas').forEach(canvas => {
-        canvas.style.cursor = 'crosshair';
-        canvas.addEventListener('mouseover', () => { canvas.style.cursor = 'pointer'; });
-        canvas.addEventListener('mouseout', () => { canvas.style.cursor = 'crosshair'; });
-    });
-}
-
-// ────────────────────────────────────────────────────────────
-// 19. DOMContentLoaded — master initialisation
+// 16. DOMContentLoaded — master initialisation
 // ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     setupThemeToggle();
@@ -612,7 +557,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic content
     populateFindings();
     populateQuotes();
-    injectChartVerdicts();
 
     // UX enhancements
     setupScrollAnimations();
@@ -620,8 +564,6 @@ document.addEventListener('DOMContentLoaded', () => {
     setupHamburger();
     setupProgressBar();
     setupBackToTop();
-    setupTextHoverEffects();
-    setupChartInteractivity();
 
     // Advanced enhancements
     setupSmoothScroll();
@@ -629,4 +571,145 @@ document.addEventListener('DOMContentLoaded', () => {
     setupConditionLegend();
     setupStatTooltips();
     scrollToHashOnLoad();
+
+    // Text hover effects
+    setupTextHover();
+
+    // Chart interactions
+    setupChartFullscreen();
+
+    // Card tilt effect
+    setupCardTilt();
+
+    // Staggered card entries
+    setupStaggeredEntries();
+
+    // Active section counter
+    setupActiveSectionCounter();
 });
+
+// ────────────────────────────────────────────────────────────
+// 17. Global Text Hover Effect
+// ────────────────────────────────────────────────────────────
+function setupTextHover() {
+    // Apply subtle hover effect to all content text
+    const selectors = [
+        '.info-card h3', '.info-card p',
+        '.section-desc',
+        '.finding-card h4', '.finding-card p',
+        '.summary-card h4', '.summary-card p',
+        '.quote-card p', '.quote-card blockquote',
+        '.team-card h4', '.team-card p',
+        '.chart-verdict',
+        '.fact-list li'
+    ];
+    document.querySelectorAll(selectors.join(', ')).forEach(el => {
+        el.classList.add('text-hover-target');
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 18. Chart Fullscreen on Double-Click
+// ────────────────────────────────────────────────────────────
+function setupChartFullscreen() {
+    document.querySelectorAll('.chart-card').forEach(card => {
+        card.addEventListener('dblclick', () => {
+            if (card.classList.contains('chart-fullscreen')) {
+                card.classList.remove('chart-fullscreen');
+                document.body.style.overflow = '';
+            } else {
+                // Close any other fullscreen chart first
+                document.querySelectorAll('.chart-fullscreen').forEach(c => {
+                    c.classList.remove('chart-fullscreen');
+                });
+                card.classList.add('chart-fullscreen');
+                document.body.style.overflow = 'hidden';
+            }
+        });
+    });
+
+    // Escape closes fullscreen
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.chart-fullscreen').forEach(c => {
+                c.classList.remove('chart-fullscreen');
+            });
+            document.body.style.overflow = '';
+        }
+    });
+
+    // Add hint text
+    document.querySelectorAll('.chart-container').forEach(container => {
+        container.setAttribute('title', 'Double-click to fullscreen');
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 19. Card 3D Tilt Effect
+// ────────────────────────────────────────────────────────────
+function setupCardTilt() {
+    const cards = document.querySelectorAll('.glass');
+
+    cards.forEach(card => {
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -3;
+            const rotateY = ((x - centerX) / centerX) * 3;
+            card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-3px)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = '';
+        });
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 20. Staggered Card Entry Delays
+// ────────────────────────────────────────────────────────────
+function setupStaggeredEntries() {
+    document.querySelectorAll('.card-grid').forEach(grid => {
+        const cards = grid.querySelectorAll('.glass');
+        cards.forEach((card, i) => {
+            card.style.transitionDelay = `${i * 100}ms`;
+        });
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 21. Active Section Counter Display
+// ────────────────────────────────────────────────────────────
+function setupActiveSectionCounter() {
+    const sections = document.querySelectorAll('.section[id]');
+    const totalSections = sections.length;
+    if (totalSections === 0) return;
+
+    // Create counter element
+    const counter = document.createElement('div');
+    counter.className = 'section-counter';
+    counter.innerHTML = '<span class="sc-current">1</span> / <span class="sc-total">' + totalSections + '</span>';
+    document.body.appendChild(counter);
+
+    const currentSpan = counter.querySelector('.sc-current');
+    let currentSection = 1;
+
+    window.addEventListener('scroll', () => {
+        const scrollY = window.scrollY + window.innerHeight / 3;
+        let activeIndex = 1;
+        sections.forEach((sec, i) => {
+            if (sec.offsetTop <= scrollY) {
+                activeIndex = i + 1;
+            }
+        });
+        if (activeIndex !== currentSection) {
+            currentSection = activeIndex;
+            currentSpan.textContent = currentSection;
+        }
+        // Show only when scrolled past hero
+        counter.classList.toggle('visible', window.scrollY > window.innerHeight * 0.8);
+    }, { passive: true });
+}

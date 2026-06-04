@@ -13,24 +13,8 @@ Chart.defaults.plugins.legend.labels.padding = 16;
 Chart.defaults.elements.bar.borderRadius = 6;
 Chart.defaults.elements.bar.borderSkipped = false;
 Chart.defaults.animation = { duration: 800, easing: 'easeOutQuart' };
-
-// Global tooltip interactivity
-Chart.defaults.plugins.tooltip.mode = 'index';
-Chart.defaults.plugins.tooltip.intersect = false;
-Chart.defaults.plugins.tooltip.usePointStyle = true;
-Chart.defaults.plugins.tooltip.boxPadding = 4;
-Chart.defaults.plugins.tooltip.caretSize = 6;
-
-// Global hover mode
-Chart.defaults.hover = { mode: 'nearest', intersect: true, animationDuration: 200 };
-
-// Active element highlight
-Chart.defaults.elements.bar.hoverBorderWidth = 2;
-Chart.defaults.elements.bar.hoverBorderColor = 'rgba(14, 165, 167, 0.8)';
-Chart.defaults.elements.point.hoverRadius = 7;
-Chart.defaults.elements.point.hoverBorderWidth = 2;
-Chart.defaults.elements.arc.hoverBorderWidth = 2;
-Chart.defaults.elements.arc.hoverOffset = 6;
+Chart.defaults.interaction = { mode: 'nearest', intersect: false };
+Chart.defaults.hover = { mode: 'nearest', intersect: false };
 
 const SCALE_GRID_COLOR = 'rgba(15, 23, 42, 0.08)';
 const SCALE_BORDER_COLOR = 'rgba(15, 23, 42, 0.12)';
@@ -81,6 +65,17 @@ function baseBarOptions(opts = {}) {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 800, easing: 'easeOutQuart' },
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        hover: {
+            mode: 'index',
+            intersect: false
+        },
+        onHover: (event, elements) => {
+            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+        },
         plugins: {
             legend: opts.legend !== undefined ? opts.legend : { display: false },
             tooltip: {
@@ -90,21 +85,23 @@ function baseBarOptions(opts = {}) {
                 padding: 14,
                 cornerRadius: 10,
                 displayColors: true,
-                multiKeyBackground: 'transparent',
-                titleColor: '#e2e8f0',
-                bodyColor: '#cbd5e1',
-                borderColor: 'rgba(14, 165, 167, 0.3)',
-                borderWidth: 1,
-                callbacks: opts.tooltipCallbacks || {}
+                boxPadding: 4,
+                usePointStyle: true,
+                callbacks: {
+                    label: function(ctx) {
+                        const val = ctx.parsed.y !== undefined ? ctx.parsed.y : ctx.parsed;
+                        const num = typeof val === 'number' ? val.toLocaleString(undefined, {maximumFractionDigits: 2}) : val;
+                        return ` ${ctx.dataset.label || ''}: ${num}`;
+                    },
+                    ...(opts.tooltipCallbacks || {})
+                }
             },
             subtitle: opts.subtitle || undefined
         },
-        interaction: {
-            mode: 'index',
-            intersect: false
-        },
-        onHover: (event, elements) => {
-            event.native.target.style.cursor = elements.length ? 'pointer' : 'default';
+        elements: {
+            bar: { hoverBackgroundColor: undefined, hoverBorderWidth: 2 },
+            point: { hitRadius: 10, hoverRadius: 8, hoverBorderWidth: 3 },
+            line: { tension: 0.3, borderWidth: 2.5 }
         },
         scales: {
             x: {
@@ -128,25 +125,39 @@ function radarOptions(max, stepSize, subtitle) {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 800, easing: 'easeOutQuart' },
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        hover: {
+            mode: 'index',
+            intersect: false
+        },
+        onHover: (event, elements) => {
+            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+        },
         plugins: {
             legend: { position: 'bottom' },
             tooltip: {
                 backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                titleFont: { weight: '600', size: 13 },
+                bodyFont: { size: 12 },
                 padding: 14,
                 cornerRadius: 10,
                 displayColors: true,
-                titleColor: '#e2e8f0',
-                bodyColor: '#cbd5e1',
-                borderColor: 'rgba(14, 165, 167, 0.3)',
-                borderWidth: 1
+                boxPadding: 4,
+                usePointStyle: true
             },
             subtitle: subtitle ? {
                 display: true,
                 text: subtitle,
-                font: { size: 11, style: 'italic' },
+                font: { size: 11, style: 'italic', weight: '400' },
                 color: '#94a3b8',
-                padding: { bottom: 10 }
+                padding: { bottom: 10, top: 0 }
             } : undefined
+        },
+        elements: {
+            point: { hitRadius: 12, hoverRadius: 7, hoverBorderWidth: 3 }
         },
         scales: {
             r: {
@@ -305,15 +316,29 @@ function initCharts() {
             responsive: true, maintainAspectRatio: false,
             cutout: '65%',
             animation: { duration: 800, easing: 'easeOutQuart' },
+            interaction: { mode: 'nearest', intersect: false },
+            onHover: (event, elements) => {
+                event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+            },
             plugins: {
                 legend: { position: 'bottom' },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    padding: 12,
-                    cornerRadius: 8,
+                    backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                    padding: 14,
+                    cornerRadius: 10,
+                    displayColors: true,
+                    boxPadding: 4,
+                    usePointStyle: true,
                     callbacks: {
                         label: ctx => `${ctx.label}: ${ctx.raw} (${((ctx.raw / 24) * 100).toFixed(0)}%)`
                     }
+                },
+                subtitle: {
+                    display: true,
+                    text: '83% male cohort \u2014 limited gender diversity in sample',
+                    font: { size: 11, style: 'italic', weight: '400' },
+                    color: '#94a3b8',
+                    padding: { bottom: 8, top: 0 }
                 }
             }
         }
@@ -335,15 +360,29 @@ function initCharts() {
             responsive: true, maintainAspectRatio: false,
             cutout: '65%',
             animation: { duration: 800, easing: 'easeOutQuart' },
+            interaction: { mode: 'nearest', intersect: false },
+            onHover: (event, elements) => {
+                event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+            },
             plugins: {
                 legend: { position: 'bottom' },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    padding: 12,
-                    cornerRadius: 8,
+                    backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                    padding: 14,
+                    cornerRadius: 10,
+                    displayColors: true,
+                    boxPadding: 4,
+                    usePointStyle: true,
                     callbacks: {
                         label: ctx => `${ctx.label}: ${ctx.raw} (${((ctx.raw / 24) * 100).toFixed(0)}%)`
                     }
+                },
+                subtitle: {
+                    display: true,
+                    text: 'Predominantly undergraduate students from a CS program',
+                    font: { size: 11, style: 'italic', weight: '400' },
+                    color: '#94a3b8',
+                    padding: { bottom: 8, top: 0 }
                 }
             }
         }
@@ -369,6 +408,13 @@ function initCharts() {
         },
         options: baseBarOptions({
             y: { ticks: { stepSize: 2 }, title: { display: true, text: 'Count' } },
+            subtitle: {
+                display: true,
+                text: 'Concentrated 20\u201324 age bracket \u2014 typical university cohort',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             tooltipCallbacks: {
                 label: ctx => `${ctx.raw} participants`
             }
@@ -396,6 +442,13 @@ function initCharts() {
             extra: { indexAxis: 'y' },
             x: { beginAtZero: true, max: 100 },
             y: {},
+            subtitle: {
+                display: true,
+                text: 'Moderate programming experience, limited AI tool familiarity',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             tooltipCallbacks: {
                 label: ctx => `Mean: ${ctx.raw}/100`
             }
@@ -435,7 +488,14 @@ function initCharts() {
         options: baseBarOptions({
             legend: { position: 'bottom' },
             y: { ticks: { stepSize: 2 }, title: { display: true, text: 'Participants' } },
-            x: { title: { display: true, text: 'Experience Range' } }
+            x: { title: { display: true, text: 'Experience Range' } },
+            subtitle: {
+                display: true,
+                text: 'Right-skewed distribution \u2014 most participants below 60%',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            }
         })
     });
 
@@ -460,7 +520,7 @@ function initCharts() {
                 pointBackgroundColor: COLORS.auto
             }]
         },
-        options: radarOptions(100, 20)
+        options: radarOptions(100, 20, 'Python well-known; Copilot & ChatGPT relatively new')
     });
 
 
@@ -485,10 +545,10 @@ function initCharts() {
             y: { max: 12, title: { display: true, text: 'Avg Requirements (out of 10+)' } },
             subtitle: {
                 display: true,
-                text: "Cohen's d = 1.25 (Large), p < 0.01",
-                font: { size: 11, style: 'italic', weight: '500' },
-                color: '#059669',
-                padding: { bottom: 8 }
+                text: 'Autocomplete boosts speed by 40% over control (p<0.01)',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
             },
             tooltipCallbacks: {
                 label: ctx => `${ctx.dataset.label}: ${ctx.raw.toFixed(2)}`
@@ -528,6 +588,13 @@ function initCharts() {
                 min: 0,
                 max: 11,
                 title: { display: true, text: 'Requirements Implemented' }
+            },
+            subtitle: {
+                display: true,
+                text: 'Tight IQR for autocomplete \u2014 consistent speed gains',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
             },
             tooltipCallbacks: {
                 label: ctx => {
@@ -569,7 +636,14 @@ function initCharts() {
         },
         options: baseBarOptions({
             legend: { position: 'bottom' },
-            y: { title: { display: true, text: 'Avg Requirements' } }
+            y: { title: { display: true, text: 'Avg Requirements' } },
+            subtitle: {
+                display: true,
+                text: 'Speed advantage persists across all three task types',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            }
         })
     });
 
@@ -618,11 +692,21 @@ function initCharts() {
             plugins: {
                 legend: { position: 'top' },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                    padding: 12,
-                    cornerRadius: 8,
+                    backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                    padding: 14,
+                    cornerRadius: 10,
+                    displayColors: true,
+                    boxPadding: 4,
+                    usePointStyle: true,
                     mode: 'index',
                     intersect: false
+                },
+                subtitle: {
+                    display: true,
+                    text: '21 of 24 participants faster with autocomplete',
+                    font: { size: 11, style: 'italic', weight: '400' },
+                    color: '#94a3b8',
+                    padding: { bottom: 8, top: 0 }
                 }
             },
             scales: {
@@ -634,7 +718,10 @@ function initCharts() {
                     title: { display: true, text: 'Requirements Implemented' }
                 }
             },
-            interaction: { mode: 'nearest', axis: 'x', intersect: false }
+            interaction: { mode: 'nearest', axis: 'x', intersect: false },
+            onHover: (event, elements) => {
+                event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
+            }
         }
     });
 
@@ -657,7 +744,14 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
-            y: { title: { display: true, text: 'Avg Correct Requirements' } }
+            y: { title: { display: true, text: 'Avg Correct Requirements' } },
+            subtitle: {
+                display: true,
+                text: 'Correctness rates nearly identical across conditions',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            }
         })
     });
 
@@ -678,10 +772,10 @@ function initCharts() {
             y: { beginAtZero: false, min: 60, max: 90, title: { display: true, text: 'Maintainability Index' } },
             subtitle: {
                 display: true,
-                text: "Cohen's d = 0.12 (Negligible), p > 0.05",
-                font: { size: 11, style: 'italic', weight: '500' },
-                color: '#64748b',
-                padding: { bottom: 8 }
+                text: "MI scores show negligible difference (Cohen's d = 0.12)",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
             }
         })
     });
@@ -708,6 +802,13 @@ function initCharts() {
         },
         options: baseBarOptions({
             y: { max: 100, title: { display: true, text: 'Accuracy %' } },
+            subtitle: {
+                display: true,
+                text: 'Combined quality metric: speed gains without quality loss',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             tooltipCallbacks: {
                 label: ctx => `Accuracy: ${ctx.raw}%`
             }
@@ -731,7 +832,14 @@ function initCharts() {
         },
         options: baseBarOptions({
             legend: { position: 'bottom' },
-            y: { beginAtZero: false, min: 55, max: 90, title: { display: true, text: 'Maintainability Index' } }
+            y: { beginAtZero: false, min: 55, max: 90, title: { display: true, text: 'Maintainability Index' } },
+            subtitle: {
+                display: true,
+                text: 'Quality consistent across CSV, PDF, and TXT tasks',
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            }
         })
     });
 
@@ -754,6 +862,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "AI-assisted conditions show 3× more total character input",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { title: { display: true, text: 'Characters Output' } },
             tooltipCallbacks: {
                 label: ctx => `${ctx.raw.toLocaleString()} chars`
@@ -794,6 +909,13 @@ function initCharts() {
             maintainAspectRatio: false,
             animation: { duration: 800, easing: 'easeOutQuart' },
             plugins: {
+            subtitle: {
+                display: true,
+                text: "Conversational users typed significantly more characters",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
                 legend: { position: 'bottom' },
                 tooltip: {
                     backgroundColor: 'rgba(15, 23, 42, 0.9)',
@@ -834,6 +956,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Conversational users generated 2× more AI communication",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { title: { display: true, text: 'AI Communication (chars)' } },
             tooltipCallbacks: { label: ctx => `${ctx.raw.toLocaleString()} chars` }
         })
@@ -862,6 +991,13 @@ function initCharts() {
             ]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "AI snippets replaced browser-based code searches",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             legend: { position: 'bottom' },
             y: { title: { display: true, text: 'Characters' } },
             tooltipCallbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()}` }
@@ -882,6 +1018,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Autocomplete: more snippets; Conversational: longer ones",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { title: { display: true, text: 'AI Snippet Count' } }
         })
     });
@@ -900,6 +1043,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Larger snippets in conversational reflect dialogue-style",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { title: { display: true, text: 'Avg Snippet Size (chars)' } },
             tooltipCallbacks: { label: ctx => `${ctx.raw.toLocaleString()} chars/snippet` }
         })
@@ -928,6 +1078,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Highest satisfaction with autocomplete (mean: 5.8/7)",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { max: 100, title: { display: true, text: 'Satisfaction (0-100)' } },
             tooltipCallbacks: { label: ctx => `Satisfaction: ${ctx.raw}/100` }
         })
@@ -951,6 +1108,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Self-reported speed matches actual measured improvements",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { max: 100, title: { display: true, text: 'Perceived Speed (0-100)' } }
         })
     });
@@ -973,6 +1137,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Perceived quality equal — confirms objective findings",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { max: 100, title: { display: true, text: 'Perceived Quality (0-100)' } }
         })
     });
@@ -995,6 +1166,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Autocomplete rated highest for IDE integration support",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { max: 100, title: { display: true, text: 'IDE Support (0-100)' } }
         })
     });
@@ -1017,6 +1195,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Conversational users felt best understood by the IDE",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { max: 100, title: { display: true, text: 'IDE Understanding (0-100)' } }
         })
     });
@@ -1062,7 +1247,7 @@ function initCharts() {
                 }
             ]
         },
-        options: radarOptions(7, 1)
+        options: radarOptions(7, 1, "Autocomplete excels broadly; conversational strong on understanding")
     });
 
 
@@ -1088,6 +1273,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "AI tools didn't inflate code volume — similar LOC across groups",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { title: { display: true, text: 'Lines of Code' } }
         })
     });
@@ -1110,6 +1302,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "No significant difference in commenting behavior",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { title: { display: true, text: 'Comment Lines' } }
         })
     });
@@ -1135,6 +1334,13 @@ function initCharts() {
             }]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Healthy comment ratios maintained with AI assistance",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             y: { title: { display: true, text: 'Ratio (code / comments)' } },
             tooltipCallbacks: {
                 label: ctx => `${ctx.raw}:1 ratio`
@@ -1172,6 +1378,13 @@ function initCharts() {
             ]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Per-task code output remains stable across conditions",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             legend: { position: 'bottom' },
             y: { title: { display: true, text: 'Avg Character Output' } },
             tooltipCallbacks: { label: ctx => `${ctx.dataset.label}: ${ctx.raw.toLocaleString()} chars` }
@@ -1239,6 +1452,13 @@ function initCharts() {
             ]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Experienced programmers benefit more from AI autocomplete",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             legend: { position: 'bottom' },
             x: { title: { display: true, text: 'Programming Experience Range' } },
             y: { title: { display: true, text: 'Mean Requirements Implemented' }, max: 11 },
@@ -1285,6 +1505,13 @@ function initCharts() {
             maintainAspectRatio: false,
             animation: { duration: 800, easing: 'easeOutQuart' },
             plugins: {
+            subtitle: {
+                display: true,
+                text: "No speed–quality tradeoff detected (r ≈ 0.03)",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
                 legend: { position: 'bottom' },
                 tooltip: {
                     backgroundColor: 'rgba(15, 23, 42, 0.9)',
@@ -1350,6 +1577,13 @@ function initCharts() {
             maintainAspectRatio: false,
             animation: { duration: 800, easing: 'easeOutQuart' },
             plugins: {
+            subtitle: {
+                display: true,
+                text: "Higher activity does not correlate with lower quality",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
                 legend: { position: 'bottom' },
                 tooltip: {
                     backgroundColor: 'rgba(15, 23, 42, 0.9)',
@@ -1419,6 +1653,13 @@ function initCharts() {
             ]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "Strong alignment between perception and reality",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             legend: { position: 'bottom' },
             y: { max: 100, title: { display: true, text: 'Score (0-100 scale)' } },
             subtitle: {
@@ -1470,6 +1711,13 @@ function initCharts() {
             maintainAspectRatio: false,
             animation: { duration: 800, easing: 'easeOutQuart' },
             plugins: {
+            subtitle: {
+                display: true,
+                text: "Speed and activity strongly correlated (r = 0.72)",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
                 legend: { display: false },
                 tooltip: {
                     enabled: true,
@@ -1541,6 +1789,13 @@ function initCharts() {
             ]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "'Faster coding' and 'useful suggestions' dominate feedback",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             legend: { position: 'bottom' },
             extra: { indexAxis: 'y' },
             x: { beginAtZero: true, title: { display: true, text: 'Mention Count' } },
@@ -1560,6 +1815,13 @@ function initCharts() {
             ]
         },
         options: baseBarOptions({
+            subtitle: {
+                display: true,
+                text: "'Incorrect suggestions' and 'distraction' are top concerns",
+                font: { size: 11, style: 'italic', weight: '400' },
+                color: '#94a3b8',
+                padding: { bottom: 8, top: 0 }
+            },
             legend: { position: 'bottom' },
             extra: { indexAxis: 'y' },
             x: { beginAtZero: true, title: { display: true, text: 'Mention Count' } },
@@ -1633,7 +1895,7 @@ function initCharts() {
                 }
             ]
         },
-        options: radarOptions(100, 20, 'Normalized 0-100 scale')
+        options: radarOptions(100, 20, 'Normalized 0-100 scale', "Autocomplete dominates overall; control trails in speed")
     });
 
     console.log('[charts] All 38 charts initialized successfully.');
