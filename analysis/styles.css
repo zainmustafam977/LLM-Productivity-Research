@@ -918,6 +918,9 @@ main {
   padding: 0;
   opacity: 0;
 }
+.chart-card:hover {
+  transform: none; /* Prevent CSS uplift which breaks Chart.js internal mouse coordinates */
+}
 .chart-card:hover .chart-download-btn {
   opacity: 1;
 }

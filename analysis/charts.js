@@ -67,7 +67,7 @@ function baseBarOptions(opts = {}) {
         interaction: {
             mode: 'index',
             intersect: false,
-            axis: 'x'
+            axis: (opts.extra && opts.extra.indexAxis === 'y') ? 'y' : 'x'
         },
         onClick: (event, elements, chart) => {
             if(elements.length > 0) {
