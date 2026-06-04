@@ -15,6 +15,7 @@ Chart.defaults.elements.bar.borderSkipped = false;
 Chart.defaults.animation = { duration: 800, easing: 'easeOutQuart' };
 Chart.defaults.interaction = { mode: 'nearest', intersect: false };
 Chart.defaults.hover = { mode: 'nearest', intersect: false };
+Chart.defaults.events = ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'];
 
 const SCALE_GRID_COLOR = 'rgba(15, 23, 42, 0.08)';
 const SCALE_BORDER_COLOR = 'rgba(15, 23, 42, 0.12)';

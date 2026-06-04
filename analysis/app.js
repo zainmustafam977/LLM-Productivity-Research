@@ -658,7 +658,8 @@ function setupChartFullscreen() {
 // 19. Card 3D Tilt Effect
 // ────────────────────────────────────────────────────────────
 function setupCardTilt() {
-    const cards = document.querySelectorAll('.glass');
+    // Exclude chart cards because continuous 3D transforms break Chart.js canvas mouse tracking
+    const cards = document.querySelectorAll('.glass:not(.chart-card)');
 
     cards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
