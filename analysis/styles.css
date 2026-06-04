@@ -262,9 +262,12 @@ main {
   height: 3px;
   background: var(--gradient-accent);
   z-index: 200;
-  transition: width 80ms linear;
   border-radius: 0 2px 2px 0;
   box-shadow: 0 0 10px rgba(14, 165, 167, 0.4);
+  will-change: transform;
+  transform-origin: left;
+  width: 100%;
+  transform: scaleX(0);
 }
 
 
@@ -301,7 +304,7 @@ main {
 .nav-logo {
   font-family: var(--font-serif);
   font-weight: 800;
-  font-size: 1.25rem;
+  font-size: 1.15rem;
   background: var(--gradient-accent-text);
   -webkit-background-clip: text;
   background-clip: text;
@@ -309,6 +312,9 @@ main {
   white-space: nowrap;
   letter-spacing: -0.03em;
   flex-shrink: 0;
+  max-width: 180px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .nav-links {
@@ -616,17 +622,30 @@ main {
 }
 
 .section-number {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   font-family: var(--font-mono);
-  font-size: 0.78rem;
-  font-weight: 600;
+  font-size: 1.1rem;
+  font-weight: 800;
   color: var(--color-accent);
   letter-spacing: 0.06em;
-  margin-bottom: 0.75rem;
-  padding: 0.25rem 0.7rem;
+  margin-bottom: 1rem;
+  width: 52px;
+  height: 52px;
   background: var(--color-accent-bg);
-  border-radius: var(--pill-radius);
-  border: 1px solid rgba(14, 165, 167, 0.1);
+  border-radius: 14px;
+  border: 2px solid rgba(14, 165, 167, 0.2);
+  box-shadow: 0 4px 16px rgba(14, 165, 167, 0.1);
+  position: relative;
+}
+.section-number::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(14,165,167,0.15), transparent 60%);
+  z-index: -1;
 }
 
 .section-header h2 {
@@ -1296,7 +1315,61 @@ main {
   }
 }
 
-/* ── Scroll-triggered fade-in ── */
+/* ── Scroll-triggered animations (enter + exit) ── */
+.anim-slide-up {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+.anim-slide-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.anim-slide-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+.anim-slide-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.anim-slide-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.7s var(--ease-out-expo), transform 0.7s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+.anim-slide-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.anim-scale-in {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-spring);
+  will-change: opacity, transform;
+}
+.anim-scale-in.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.anim-fade {
+  opacity: 0;
+  transition: opacity 0.8s var(--ease-out-expo);
+  will-change: opacity;
+}
+.anim-fade.visible {
+  opacity: 1;
+}
+
+/* Legacy support */
 .fade-in-section {
   opacity: 0;
   transform: translateY(28px);
@@ -1306,6 +1379,32 @@ main {
 .fade-in-section.visible {
   opacity: 1;
   transform: translateY(0);
+}
+
+/* ── Global text hover interaction ── */
+.text-hover-target {
+  transition: transform 0.25s var(--ease-out-expo), color 0.25s var(--ease-out-expo);
+  display: inline-block;
+}
+.text-hover-target:hover {
+  transform: translateY(-2px);
+  color: var(--color-accent);
+}
+
+/* Chart verdict caption below each chart */
+.chart-verdict {
+  margin-top: 0.75rem;
+  padding: 0;
+  font-size: 0.82rem;
+  font-style: italic;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+  text-align: center;
+}
+.chart-verdict strong {
+  color: var(--color-accent);
+  font-style: normal;
+  font-weight: 600;
 }
 
 
@@ -1343,6 +1442,17 @@ main {
   }
   .scroll-indicator {
     animation: none;
+  }
+  .anim-slide-up,
+  .anim-slide-left,
+  .anim-slide-right,
+  .anim-scale-in,
+  .anim-fade {
+    opacity: 1;
+    transform: none;
+  }
+  .text-hover-target:hover {
+    transform: none;
   }
 }
 

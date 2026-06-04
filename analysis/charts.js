@@ -14,6 +14,24 @@ Chart.defaults.elements.bar.borderRadius = 6;
 Chart.defaults.elements.bar.borderSkipped = false;
 Chart.defaults.animation = { duration: 800, easing: 'easeOutQuart' };
 
+// Global tooltip interactivity
+Chart.defaults.plugins.tooltip.mode = 'index';
+Chart.defaults.plugins.tooltip.intersect = false;
+Chart.defaults.plugins.tooltip.usePointStyle = true;
+Chart.defaults.plugins.tooltip.boxPadding = 4;
+Chart.defaults.plugins.tooltip.caretSize = 6;
+
+// Global hover mode
+Chart.defaults.hover = { mode: 'nearest', intersect: true, animationDuration: 200 };
+
+// Active element highlight
+Chart.defaults.elements.bar.hoverBorderWidth = 2;
+Chart.defaults.elements.bar.hoverBorderColor = 'rgba(14, 165, 167, 0.8)';
+Chart.defaults.elements.point.hoverRadius = 7;
+Chart.defaults.elements.point.hoverBorderWidth = 2;
+Chart.defaults.elements.arc.hoverBorderWidth = 2;
+Chart.defaults.elements.arc.hoverOffset = 6;
+
 const SCALE_GRID_COLOR = 'rgba(15, 23, 42, 0.08)';
 const SCALE_BORDER_COLOR = 'rgba(15, 23, 42, 0.12)';
 
@@ -66,14 +84,27 @@ function baseBarOptions(opts = {}) {
         plugins: {
             legend: opts.legend !== undefined ? opts.legend : { display: false },
             tooltip: {
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                titleFont: { weight: '600' },
+                backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                titleFont: { weight: '600', size: 13 },
                 bodyFont: { size: 12 },
-                padding: 12,
-                cornerRadius: 8,
+                padding: 14,
+                cornerRadius: 10,
+                displayColors: true,
+                multiKeyBackground: 'transparent',
+                titleColor: '#e2e8f0',
+                bodyColor: '#cbd5e1',
+                borderColor: 'rgba(14, 165, 167, 0.3)',
+                borderWidth: 1,
                 callbacks: opts.tooltipCallbacks || {}
             },
             subtitle: opts.subtitle || undefined
+        },
+        interaction: {
+            mode: 'index',
+            intersect: false
+        },
+        onHover: (event, elements) => {
+            event.native.target.style.cursor = elements.length ? 'pointer' : 'default';
         },
         scales: {
             x: {
@@ -100,9 +131,14 @@ function radarOptions(max, stepSize, subtitle) {
         plugins: {
             legend: { position: 'bottom' },
             tooltip: {
-                backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                padding: 12,
-                cornerRadius: 8
+                backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                padding: 14,
+                cornerRadius: 10,
+                displayColors: true,
+                titleColor: '#e2e8f0',
+                bodyColor: '#cbd5e1',
+                borderColor: 'rgba(14, 165, 167, 0.3)',
+                borderWidth: 1
             },
             subtitle: subtitle ? {
                 display: true,

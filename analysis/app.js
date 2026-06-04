@@ -25,30 +25,64 @@ function animateCounter(id, target, duration) {
 }
 
 // ────────────────────────────────────────────────────────────
-// 3. Scroll-Triggered Fade Animations
+// 3. Scroll-Triggered Animations (enter + exit)
 // ────────────────────────────────────────────────────────────
 function setupScrollAnimations() {
     try {
-        const targets = document.querySelectorAll(
-            '.section, .chart-card, .info-card, .finding-card, .quote-card'
-        );
-        if (!targets.length) return;
+        const ANIM_TYPES = ['anim-slide-up', 'anim-slide-left', 'anim-slide-right', 'anim-scale-in', 'anim-fade'];
+        let animIndex = 0;
 
-        targets.forEach(el => el.classList.add('fade-in-section'));
+        // Sections get slide-up
+        document.querySelectorAll('.section').forEach(el => {
+            el.classList.add('anim-slide-up');
+        });
+
+        // Chart cards get varied animations
+        document.querySelectorAll('.chart-card').forEach((el, i) => {
+            const type = i % 2 === 0 ? 'anim-slide-left' : 'anim-slide-right';
+            el.classList.add(type);
+        });
+
+        // Info cards scale in
+        document.querySelectorAll('.info-card').forEach(el => {
+            el.classList.add('anim-scale-in');
+        });
+
+        // Finding cards alternate
+        document.querySelectorAll('.finding-card').forEach((el, i) => {
+            el.classList.add(i % 2 === 0 ? 'anim-slide-left' : 'anim-slide-right');
+        });
+
+        // Quote cards fade in
+        document.querySelectorAll('.quote-card').forEach(el => {
+            el.classList.add('anim-fade');
+        });
+
+        // Summary/team cards scale
+        document.querySelectorAll('.summary-card, .team-card').forEach(el => {
+            el.classList.add('anim-scale-in');
+        });
+
+        // Single observer for ALL animated elements — trigger on enter AND exit
+        const allAnimated = document.querySelectorAll(
+            '.anim-slide-up, .anim-slide-left, .anim-slide-right, .anim-scale-in, .anim-fade'
+        );
 
         const observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('visible');
-                        observer.unobserve(entry.target); // animate once
+                    } else {
+                        // Remove visible when scrolling OUT so it re-animates on return
+                        entry.target.classList.remove('visible');
                     }
                 });
             },
-            { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+            { threshold: 0.06, rootMargin: '0px 0px -60px 0px' }
         );
 
-        targets.forEach(el => observer.observe(el));
+        allAnimated.forEach(el => observer.observe(el));
     } catch (err) {
         console.warn('setupScrollAnimations:', err);
     }
@@ -131,16 +165,15 @@ function setupHamburger() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 6. Dark Mode Toggle
+// 6. Theme Toggle — Light theme is the DEFAULT
 // ────────────────────────────────────────────────────────────
 function setupThemeToggle() {
     const toggle = document.getElementById('themeToggle');
     if (!toggle) return;
 
-    // Check saved preference or system preference
+    // Light theme is always the default unless user explicitly chose dark
     const savedTheme = localStorage.getItem('theme');
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    const initialTheme = savedTheme || 'light';
     document.documentElement.setAttribute('data-theme', initialTheme);
 
     toggle.addEventListener('click', () => {
@@ -152,19 +185,26 @@ function setupThemeToggle() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 7. Reading Progress Bar
+// 7. Reading Progress Bar — smooth RAF-based
 // ────────────────────────────────────────────────────────────
 function setupProgressBar() {
     const bar = document.getElementById('progressBar');
     if (!bar) return;
 
-    window.addEventListener('scroll', () => {
+    let ticking = false;
+    function updateProgress() {
         const winScroll = document.documentElement.scrollTop;
-        const height =
-            document.documentElement.scrollHeight -
-            document.documentElement.clientHeight;
-        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
-        bar.style.width = scrolled + '%';
+        const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = height > 0 ? winScroll / height : 0;
+        bar.style.transform = `scaleX(${scrolled})`;
+        ticking = false;
+    }
+
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(updateProgress);
+            ticking = true;
+        }
     }, { passive: true });
 }
 
@@ -345,23 +385,7 @@ function populateQuotes() {
             container.appendChild(card);
         });
 
-        // Observe newly created quote cards for fade-in animation
-        const observer = new IntersectionObserver(
-            (entries) => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
-                        observer.unobserve(entry.target);
-                    }
-                });
-            },
-            { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
-        );
-
-        container.querySelectorAll('.quote-card').forEach(card => {
-            card.classList.add('fade-in-section');
-            observer.observe(card);
-        });
+        // Note: quote-card animations are handled by setupScrollAnimations() via anim-fade class
     } catch (err) {
         console.warn('populateQuotes:', err);
     }
@@ -484,7 +508,88 @@ function scrollToHashOnLoad() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 16. DOMContentLoaded — master initialisation
+// 16. Apply Text Hover Effect to all headings & descriptions
+// ────────────────────────────────────────────────────────────
+function setupTextHoverEffects() {
+    const targets = document.querySelectorAll(
+        '.section-header h2, .section-desc, .subhead, .info-card h3, .chart-card h3, .finding-card h4, .summary-card h3, .team-card h3, .footer p'
+    );
+    targets.forEach(el => {
+        el.classList.add('text-hover-target');
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 17. Inject Chart Verdicts (one-line captions below each chart)
+// ────────────────────────────────────────────────────────────
+function injectChartVerdicts() {
+    const verdicts = {
+        chartGender: 'Study sample is <strong>83% male</strong>, reflecting the broader CS student demographic.',
+        chartEducation: 'Bachelor-level students dominate — a <strong>homogeneous educational cohort</strong>.',
+        chartAge: 'Concentrated 20–25 age range ensures <strong>minimal age confounds</strong>.',
+        chartExperience: 'Strong Python skills, moderate AI tool familiarity — <strong>balanced baseline</strong>.',
+        chartProgExpDist: 'Experience spans 0–100% — adequate <strong>variance for correlation analysis</strong>.',
+        chartToolFamiliarity: 'VSCode expertise is high; Copilot/ChatGPT exposure varies <strong>widely</strong>.',
+        chartSpeedCondition: '<strong>Autocomplete wins decisively</strong> — 78% faster than the control baseline.',
+        chartSpeedBox: 'Autocomplete has a <strong>tight, high-performing distribution</strong> vs. wide control spread.',
+        chartSpeedTaskCondition: 'AI advantage is <strong>consistent across all three task types</strong>.',
+        chartSpeedIndividual: 'Individual variance is high — <strong>some participants gain 3× from AI</strong>.',
+        chartQualityCorrect: 'More requirements implemented ≠ more errors — <strong>quality holds steady</strong>.',
+        chartMaintainability: '<strong>Negligible MI difference</strong> — AI does not degrade code quality (d = 0.12).',
+        chartAccuracy: 'Autocomplete achieves the <strong>highest correct-to-attempted ratio</strong>.',
+        chartQualityTask: 'Quality is <strong>task-dependent</strong> — PDF parsing shows the most variance.',
+        chartActivity: 'AI-assisted conditions generate <strong>significantly more output volume</strong>.',
+        chartActivityDist: 'Individual output spread <strong>widens dramatically</strong> with AI assistance.',
+        chartCommAI: 'Conversational AI drives <strong>3× more AI communication</strong> than autocomplete.',
+        chartCommBrowserVsAI: 'AI tools <strong>nearly eliminate Google/Stack Overflow dependency</strong>.',
+        chartCommSnippets: 'Conversational generates <strong>fewer but larger</strong> code suggestions.',
+        chartCommSnippetSize: 'Mean snippet size is <strong>4× larger in conversational</strong> mode.',
+        chartSatisfaction: 'Conversational AI achieves <strong>peak satisfaction</strong>; control frustrates users.',
+        chartPerceivedSpeed: 'Self-reported speed aligns with <strong>measured performance</strong> rankings.',
+        chartPerceivedQuality: 'Perceived quality is <strong>surprisingly uniform</strong> across all conditions.',
+        chartIDESupport: 'AI-assisted IDEs score <strong>dramatically higher</strong> on perceived support.',
+        chartIDEUnderstanding: 'Conversational AI best helps users feel <strong>understood by the IDE</strong>.',
+        chartUXRadar: 'Conversational excels at <strong>exploration</strong>; autocomplete at <strong>flow</strong>.',
+        chartLOC: 'Autocomplete produces <strong>~40% more lines of code</strong> than manual coding.',
+        chartComments: 'Comment density is <strong>similar</strong> — AI doesn\'t suppress documentation.',
+        chartCodeCommentRatio: 'Code-to-comment ratio stays <strong>healthy across all conditions</strong>.',
+        chartCodePerTask: 'Output per task varies — <strong>CSV tasks benefit most</strong> from AI help.',
+        chartExpVsSpeed: 'Experience has <strong>minimal correlation</strong> with AI-boosted speed gains.',
+        chartSpeedVsQuality: '<strong>No speed-quality tradeoff</strong> — faster developers write equally good code.',
+        chartActivityVsQuality: 'More output volume <strong>does not correlate</strong> with lower quality.',
+        chartPerceivedVsActual: 'Perceived speed <strong>closely mirrors</strong> actual measured performance.',
+        chartHeatmap: 'Strong <strong>speed-correctness correlation</strong>; quality metrics are independent.',
+        chartOverallRadar: 'Autocomplete leads on <strong>speed/efficiency</strong>; conversational on <strong>UX/satisfaction</strong>.',
+        chartPositiveThemes: '<strong>Learning and speed</strong> are the most frequently praised AI benefits.',
+        chartNegativeThemes: '<strong>Verbosity and over-reliance</strong> are the top concerns with AI tools.'
+    };
+
+    Object.entries(verdicts).forEach(([canvasId, html]) => {
+        const canvas = document.getElementById(canvasId);
+        if (!canvas) return;
+        const container = canvas.closest('.chart-container');
+        if (!container) return;
+        const verdict = document.createElement('p');
+        verdict.className = 'chart-verdict';
+        verdict.innerHTML = html;
+        container.after(verdict);
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 18. Make charts interactive (pointer cursor + active element highlight)
+// ────────────────────────────────────────────────────────────
+function setupChartInteractivity() {
+    // Make all chart canvases show pointer cursor on hover
+    document.querySelectorAll('.chart-container canvas').forEach(canvas => {
+        canvas.style.cursor = 'crosshair';
+        canvas.addEventListener('mouseover', () => { canvas.style.cursor = 'pointer'; });
+        canvas.addEventListener('mouseout', () => { canvas.style.cursor = 'crosshair'; });
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 19. DOMContentLoaded — master initialisation
 // ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     setupThemeToggle();
@@ -507,6 +612,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Dynamic content
     populateFindings();
     populateQuotes();
+    injectChartVerdicts();
 
     // UX enhancements
     setupScrollAnimations();
@@ -514,6 +620,8 @@ document.addEventListener('DOMContentLoaded', () => {
     setupHamburger();
     setupProgressBar();
     setupBackToTop();
+    setupTextHoverEffects();
+    setupChartInteractivity();
 
     // Advanced enhancements
     setupSmoothScroll();
