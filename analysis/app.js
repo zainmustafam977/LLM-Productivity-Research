@@ -368,7 +368,123 @@ function populateQuotes() {
 }
 
 // ────────────────────────────────────────────────────────────
-// 11. DOMContentLoaded — master initialisation
+// 11. Smooth Scroll Navigation (Enhancement 1)
+// ────────────────────────────────────────────────────────────
+function setupSmoothScroll() {
+    document.querySelectorAll('.nav-link[href^="#"]').forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            const targetId = link.getAttribute('href').substring(1);
+            const target = document.getElementById(targetId);
+            if (!target) return;
+            const navHeight = document.querySelector('.sticky-nav')?.offsetHeight || 64;
+            const targetPosition = target.getBoundingClientRect().top + window.scrollY - navHeight - 20;
+            window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+        });
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 12. Keyboard Shortcuts (Enhancement 2)
+// ────────────────────────────────────────────────────────────
+function setupKeyboardShortcuts() {
+    document.addEventListener('keydown', (e) => {
+        // Don't trigger if user is typing in an input
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+        // T = toggle dark mode
+        if (e.key === 't' || e.key === 'T') {
+            const toggle = document.getElementById('themeToggle');
+            if (toggle) toggle.click();
+        }
+        // Home = scroll to top
+        if (e.key === 'Home') {
+            e.preventDefault();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+        // Escape = close mobile menu
+        if (e.key === 'Escape') {
+            const navLinks = document.getElementById('navLinks');
+            const btn = document.getElementById('hamburgerBtn');
+            if (navLinks && navLinks.classList.contains('mobile-open')) {
+                navLinks.classList.remove('mobile-open');
+                if (btn) {
+                    btn.classList.remove('active');
+                    btn.setAttribute('aria-expanded', 'false');
+                }
+            }
+        }
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 13. Condition Legend Strip (Enhancement 3)
+// ────────────────────────────────────────────────────────────
+function setupConditionLegend() {
+    const nav = document.querySelector('.sticky-nav');
+    if (!nav) return;
+
+    const legend = document.createElement('div');
+    legend.className = 'condition-legend';
+    legend.setAttribute('aria-label', 'Condition color legend');
+    legend.innerHTML = `
+        <div class="legend-item"><span class="legend-dot" style="background:#f59e0b"></span>Control</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#0ea5a7"></span>Autocomplete</div>
+        <div class="legend-item"><span class="legend-dot" style="background:#e11d48"></span>Conversational</div>
+    `;
+    nav.after(legend);
+
+    // Show/hide legend on scroll (only visible after hero section)
+    let legendVisible = false;
+    window.addEventListener('scroll', () => {
+        const shouldShow = window.scrollY > window.innerHeight * 0.8;
+        if (shouldShow !== legendVisible) {
+            legendVisible = shouldShow;
+            legend.classList.toggle('visible', shouldShow);
+        }
+    }, { passive: true });
+}
+
+// ────────────────────────────────────────────────────────────
+// 14. Stat Card Tooltips (Enhancement 4)
+// ────────────────────────────────────────────────────────────
+function setupStatTooltips() {
+    const tooltips = {
+        'animParticipants': '24 valid participants out of 29 enrolled in the study',
+        'animTasks': 'CSV parsing, PDF parsing, and TXT parsing tasks',
+        'animConditions': 'Control (no AI), Autocomplete (inline AI), Conversational (chat AI)',
+        'animDimensions': '10 semantic differential UX scales rated on a 1–7 Likert scale'
+    };
+
+    Object.entries(tooltips).forEach(([id, text]) => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        const card = el.closest('.stat-card');
+        if (!card) return;
+        card.setAttribute('title', text);
+        card.setAttribute('aria-label', text);
+        card.style.cursor = 'help';
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 15. Scroll-to-Hash on Load (Enhancement 5)
+// ────────────────────────────────────────────────────────────
+function scrollToHashOnLoad() {
+    if (!window.location.hash) return;
+    const targetId = window.location.hash.substring(1);
+    const target = document.getElementById(targetId);
+    if (!target) return;
+    // Delay to ensure layout is settled
+    setTimeout(() => {
+        const navHeight = document.querySelector('.sticky-nav')?.offsetHeight || 64;
+        const targetPosition = target.getBoundingClientRect().top + window.scrollY - navHeight - 20;
+        window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    }, 500);
+}
+
+// ────────────────────────────────────────────────────────────
+// 16. DOMContentLoaded — master initialisation
 // ────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', () => {
     setupThemeToggle();
@@ -398,4 +514,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setupHamburger();
     setupProgressBar();
     setupBackToTop();
+
+    // Advanced enhancements
+    setupSmoothScroll();
+    setupKeyboardShortcuts();
+    setupConditionLegend();
+    setupStatTooltips();
+    scrollToHashOnLoad();
 });

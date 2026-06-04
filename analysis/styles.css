@@ -410,6 +410,17 @@ main {
   outline-offset: 2px;
 }
 
+/* ── Theme Toggle Icon Swap ── */
+.theme-toggle .icon-moon {
+  display: none;
+}
+[data-theme='dark'] .theme-toggle .icon-sun {
+  display: none;
+}
+[data-theme='dark'] .theme-toggle .icon-moon {
+  display: block;
+}
+
 
 /* ═══════════════════════════════════════════════════════════
    5. HERO SECTION
@@ -508,6 +519,11 @@ main {
   min-width: 140px;
   transition: all var(--transition-base);
   cursor: default;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.25rem;
 }
 .stat-card:hover {
   transform: translateY(-4px);
@@ -516,6 +532,7 @@ main {
 }
 
 .stat-number {
+  display: block;
   font-family: var(--font-serif);
   font-size: 2rem;
   font-weight: 800;
@@ -523,16 +540,17 @@ main {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  line-height: 1.1;
+  line-height: 1.2;
 }
 
 .stat-label {
-  font-size: 0.7rem;
+  display: block;
+  font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--color-text-muted);
-  margin-top: 0.25rem;
+  margin-top: 0.15rem;
 }
 
 /* ── Scroll Indicator — z-index:10 (above stat cards) ── */
@@ -588,6 +606,11 @@ main {
   margin: 0 auto;
 }
 
+/* Subtle divider between sections */
+.section + .section {
+  border-top: 1px solid var(--color-border);
+}
+
 .section-header {
   margin-bottom: 3rem;
 }
@@ -599,27 +622,28 @@ main {
   font-weight: 600;
   color: var(--color-accent);
   letter-spacing: 0.06em;
-  margin-bottom: 0.6rem;
-  padding: 0.2rem 0.65rem;
+  margin-bottom: 0.75rem;
+  padding: 0.25rem 0.7rem;
   background: var(--color-accent-bg);
   border-radius: var(--pill-radius);
   border: 1px solid rgba(14, 165, 167, 0.1);
 }
 
 .section-header h2 {
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
+  margin-bottom: 0;
 }
 
 .section-desc {
   font-size: 1.05rem;
   color: var(--color-text-secondary);
   max-width: 720px;
-  margin-top: 0.75rem;
+  margin-top: 1rem;
   line-height: 1.7;
 }
 
 .stack-lg {
-  margin-top: 3.5rem;
+  margin-top: 3rem;
 }
 
 .subhead {
@@ -627,7 +651,7 @@ main {
   font-size: 1.3rem;
   font-weight: 600;
   color: var(--color-text);
-  margin-bottom: 1.25rem;
+  margin-bottom: 1.5rem;
   letter-spacing: -0.01em;
 }
 
@@ -680,11 +704,16 @@ main {
   font-size: 1.15rem;
   font-weight: 600;
   margin-bottom: 0.75rem;
+  line-height: 1.4;
 }
 .info-card p {
   color: var(--color-text-secondary);
   font-size: 0.95rem;
   line-height: 1.7;
+  margin-bottom: 0.5rem;
+}
+.info-card p:last-child {
+  margin-bottom: 0;
 }
 
 /* ── Profile Card ── */
@@ -709,21 +738,29 @@ main {
 .fact-list {
   list-style: none;
   padding: 0;
+  margin-top: 0.25rem;
 }
 .fact-list li {
-  padding: 0.65rem 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 1rem;
+  padding: 0.7rem 0;
   border-bottom: 1px solid var(--color-border);
   font-size: 0.93rem;
   color: var(--color-text-secondary);
-  line-height: 1.6;
+  line-height: 1.5;
 }
 .fact-list li:last-child {
   border-bottom: none;
 }
+.fact-list li span {
+  flex-shrink: 0;
+}
 .fact-list strong {
   color: var(--color-text);
   font-weight: 600;
-  margin-right: 0.3rem;
+  text-align: right;
 }
 
 /* ── Tags ── */
@@ -738,6 +775,7 @@ main {
   background: var(--color-accent-bg);
   color: var(--color-accent);
   border: 1px solid rgba(14, 165, 167, 0.12);
+  margin-bottom: 1rem;
 }
 .tag-auto {
   background: var(--color-autocomplete-bg);
@@ -760,6 +798,7 @@ main {
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
+  margin-top: 1.5rem;
 }
 
 .metric {
@@ -773,23 +812,26 @@ main {
 }
 
 .metric-label {
+  display: block;
   font-size: 0.72rem;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--color-text-muted);
-  margin-bottom: 0.35rem;
+  margin-bottom: 0.5rem;
 }
 
 .metric-value {
+  display: block;
   font-family: var(--font-serif);
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: var(--color-text);
-  line-height: 1.2;
+  line-height: 1.3;
+  word-break: break-word;
 }
 .metric-value.muted {
-  font-size: 1.2rem;
+  font-size: 1.15rem;
   color: var(--color-text-muted);
   font-weight: 500;
 }
@@ -866,14 +908,15 @@ main {
 }
 
 .stat-annotation {
-  margin-top: 0.75rem;
-  padding: 0.6rem 0.9rem;
+  margin-top: 1.25rem;
+  margin-bottom: 0.5rem;
+  padding: 0.75rem 1rem;
   background: var(--color-bg-alt);
   border-radius: var(--card-radius-sm);
   font-family: var(--font-mono);
-  font-size: 0.72rem;
+  font-size: 0.75rem;
   color: var(--color-text-muted);
-  line-height: 1.5;
+  line-height: 1.6;
   border-left: 3px solid var(--color-accent);
 }
 
@@ -962,6 +1005,19 @@ main {
   position: relative;
   overflow: hidden;
 }
+.finding-card h4 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  margin-bottom: 0.75rem;
+  line-height: 1.4;
+  color: var(--color-text);
+}
+.finding-card p {
+  font-size: 0.92rem;
+  line-height: 1.7;
+  color: var(--color-text-secondary);
+  margin: 0;
+}
 .finding-card::before {
   content: '';
   position: absolute;
@@ -994,7 +1050,7 @@ main {
 }
 
 .quote-card {
-  padding: 2rem;
+  padding: 2rem 2rem 1.5rem;
   position: relative;
 }
 .quote-card::before {
@@ -1009,13 +1065,17 @@ main {
   line-height: 1;
   pointer-events: none;
 }
-.quote-card p {
+.quote-card p,
+.quote-card blockquote {
   font-size: 0.95rem;
   font-style: italic;
   line-height: 1.7;
   color: var(--color-text-secondary);
   position: relative;
   z-index: 1;
+  margin: 0;
+  padding: 0;
+  border: none;
 }
 
 .quote-source {
@@ -1049,6 +1109,51 @@ main {
 .badge-conv {
   background: var(--color-conversational-bg);
   color: var(--color-conversational);
+}
+
+
+/* ═══════════════════════════════════════════════════════════
+   12b. CONDITION LEGEND STRIP (injected by JS)
+   ═══════════════════════════════════════════════════════════ */
+
+.condition-legend {
+  position: sticky;
+  top: var(--nav-height);
+  z-index: 99;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 0.4rem 1rem;
+  background: var(--color-bg-alt);
+  border-bottom: 1px solid var(--color-border);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--color-text-secondary);
+  opacity: 0;
+  transform: translateY(-100%);
+  transition: opacity var(--transition-base), transform var(--transition-base);
+  pointer-events: none;
+}
+.condition-legend.visible {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.legend-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 6px rgba(0,0,0,0.15);
 }
 
 
@@ -1257,6 +1362,15 @@ main {
   .hamburger {
     display: flex;
   }
+  .hamburger.active span:nth-child(1) {
+    transform: rotate(45deg) translate(5px, 5px);
+  }
+  .hamburger.active span:nth-child(2) {
+    opacity: 0;
+  }
+  .hamburger.active span:nth-child(3) {
+    transform: rotate(-45deg) translate(5px, -5px);
+  }
   .nav-links {
     position: absolute;
     top: var(--nav-height);
@@ -1291,6 +1405,11 @@ main {
   }
   .nav-inner {
     padding: 0 1.25rem;
+  }
+
+  /* Hide condition legend on mobile */
+  .condition-legend {
+    display: none;
   }
 
   /* Hero */
