@@ -709,7 +709,7 @@ main {
               box-shadow var(--transition-base),
               border-color var(--transition-base);
 }
-.glass:hover:not(.chart-card) {
+.glass:hover {
   transform: translateY(-3px);
   box-shadow: var(--shadow-card-hover);
   border-color: rgba(14, 165, 167, 0.12);
@@ -917,10 +917,6 @@ main {
   transition: all var(--transition-fast);
   padding: 0;
   opacity: 0;
-.chart-card:hover {
-  /* Still give chart cards the box-shadow feedback, just no transform */
-  box-shadow: var(--shadow-card-hover);
-  border-color: rgba(14, 165, 167, 0.12);
 }
 .chart-card:hover .chart-download-btn {
   opacity: 1;
