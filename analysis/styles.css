@@ -897,6 +897,7 @@ main {
 
 .chart-container canvas {
   border-radius: var(--card-radius-sm);
+  cursor: pointer;
 }
 
 .chart-download-btn {

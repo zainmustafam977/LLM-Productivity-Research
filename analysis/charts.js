@@ -13,9 +13,6 @@ Chart.defaults.plugins.legend.labels.padding = 16;
 Chart.defaults.elements.bar.borderRadius = 6;
 Chart.defaults.elements.bar.borderSkipped = false;
 Chart.defaults.animation = { duration: 800, easing: 'easeOutQuart' };
-Chart.defaults.interaction = { mode: 'nearest', intersect: false };
-Chart.defaults.hover = { mode: 'nearest', intersect: false };
-Chart.defaults.events = ['mousemove', 'mouseout', 'click', 'touchstart', 'touchmove'];
 
 const SCALE_GRID_COLOR = 'rgba(15, 23, 42, 0.08)';
 const SCALE_BORDER_COLOR = 'rgba(15, 23, 42, 0.12)';
@@ -70,15 +67,8 @@ function baseBarOptions(opts = {}) {
             mode: 'index',
             intersect: false
         },
-        hover: {
-            mode: 'index',
-            intersect: false
-        },
-        onHover: (event, elements) => {
-            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
-        },
         plugins: {
-            legend: opts.legend !== undefined ? opts.legend : { display: false },
+            legend: opts.legend !== undefined ? opts.legend : { display: true, position: 'bottom' },
             tooltip: {
                 backgroundColor: 'rgba(15, 23, 42, 0.92)',
                 titleFont: { weight: '600', size: 13 },
@@ -129,13 +119,6 @@ function radarOptions(max, stepSize, subtitle) {
         interaction: {
             mode: 'index',
             intersect: false
-        },
-        hover: {
-            mode: 'index',
-            intersect: false
-        },
-        onHover: (event, elements) => {
-            event.native.target.style.cursor = elements.length > 0 ? 'pointer' : 'default';
         },
         plugins: {
             legend: { position: 'bottom' },
