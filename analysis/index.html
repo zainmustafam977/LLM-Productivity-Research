@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LLM Programming Productivity Analysis — EICS 2024 Study</title>
+  <meta name="description" content="Comprehensive interactive analysis dashboard exploring how LLM-powered coding tools (Autocomplete & Conversational AI) impact programming speed, code quality, and developer experience. Based on a controlled study with 24 participants.">
+  <meta property="og:title" content="LLM Programming Productivity Analysis — EICS 2024 Study">
+  <meta property="og:description" content="Interactive dashboard analyzing LLM impact on programming productivity, code quality, and developer UX across 24 participants and 3 conditions.">
+  <meta property="og:type" content="website">
+  <meta name="theme-color" content="#0ea5a7">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📊</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@600;700;800&family=JetBrains+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <a href="#main-content" class="skip-link">Skip to main content</a>
+  <div class="progress-bar" id="progressBar"></div>
+
+  <nav id="stickyNav" class="sticky-nav" role="navigation" aria-label="Main navigation">
+    <div class="nav-inner">
+      <div class="nav-logo">LLM Productivity Study</div>
+      <button class="hamburger" id="hamburgerBtn" aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-links" id="navLinks">
+        <a class="nav-link" href="#s_acad" data-section="s_acad">Academic</a>
+        <a class="nav-link" href="#s_standards" data-section="s_standards">Standards</a>
+        <a class="nav-link" href="#s1" data-section="s1">Demographics</a>
+        <a class="nav-link" href="#s2" data-section="s2">Speed</a>
+        <a class="nav-link" href="#s3" data-section="s3">Quality</a>
+        <a class="nav-link" href="#s4" data-section="s4">Activity</a>
+        <a class="nav-link" href="#s5" data-section="s5">UX</a>
+        <a class="nav-link" href="#s6" data-section="s6">Code Output</a>
+        <a class="nav-link" href="#s7" data-section="s7">Correlations</a>
+        <a class="nav-link" href="#s8" data-section="s8">Qualitative</a>
+        <a class="nav-link" href="#s_team" data-section="s_team">Team</a>
+      </div>
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode" title="Toggle dark mode">
+        <svg class="icon-sun" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        <svg class="icon-moon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+      </button>
+    </div>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-content">
+      <span class="badge">EICS 2024 • CS326 HCI Research</span>
+      <h1>Programming with LLMs<br><span class="hero-accent">A Controlled Productivity Study</span></h1>
+      <p class="subtitle">How do AI-powered coding assistants reshape developer productivity, code quality, and user experience? An empirical investigation with 24 participants across three experimental conditions.</p>
+      <div class="hero-stats">
+        <div class="stat-card">
+          <span id="animParticipants" class="stat-number">0</span>
+          <span class="stat-label">Participants</span>
+        </div>
+        <div class="stat-card">
+          <span id="animTasks" class="stat-number">0</span>
+          <span class="stat-label">Tasks</span>
+        </div>
+        <div class="stat-card">
+          <span id="animConditions" class="stat-number">0</span>
+          <span class="stat-label">Conditions</span>
+        </div>
+        <div class="stat-card">
+          <span id="animDimensions" class="stat-number">0</span>
+          <span class="stat-label">UX Dimensions</span>
+        </div>
+      </div>
+      <p class="hero-date">Last updated: June 4, 2026</p>
+    </div>
+    <div class="scroll-indicator" aria-hidden="true">
+      <span>Scroll to explore</span>
+      <div class="scroll-arrow"></div>
+    </div>
+  </header>
+
+  <main id="main-content">
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 01 — Academic Context              -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s_acad" class="section">
+      <div class="section-header">
+        <span class="section-number">01</span>
+        <h2>Academic Context</h2>
+        <p class="section-desc">Institutional framework, course affiliation, and study parameters for this controlled experiment.</p>
+      </div>
+      <div class="card-grid two-col">
+        <div class="glass info-card profile-card">
+          <img class="profile-avatar" src="assets/Professor Qamar Abbas Arbie.jpg" alt="Professor Qamar Abbas Arbie" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI5NiIgaGVpZ2h0PSI5NiI+PHJlY3Qgd2lkdGg9Ijk2IiBoZWlnaHQ9Ijk2IiBmaWxsPSIjZTJlOGYwIiByeD0iNDgiLz48dGV4dCB4PSI0OCIgeT0iNTYiIHRleHQtYW5jaG9yPSJtaWRkbGUiIGZpbGw9IiM2NDc0OGIiIGZvbnQtc2l6ZT0iMzYiIGZvbnQtZmFtaWx5PSJzYW5zLXNlcmlmIj5RQTwvdGV4dD48L3N2Zz4='">
+          <div>
+            <h3>Professor Qamar Abbas Arbie</h3>
+            <p>Course Supervisor — CS326 Human Computer Interaction (Section V6)</p>
+            <p class="mono">qamar.abbas@umt.edu.pk</p>
+          </div>
+        </div>
+        <div class="glass info-card">
+          <h3>Study Parameters</h3>
+          <ul class="fact-list">
+            <li><span>Valid participants</span><strong>24 of 29 enrolled</strong></li>
+            <li><span>Programming tasks</span><strong>CSV, PDF, TXT parsing</strong></li>
+            <li><span>Experimental conditions</span><strong>Control, Autocomplete, Conversational</strong></li>
+            <li><span>UX assessment scale</span><strong>10 semantic differentials (1–7)</strong></li>
+            <li><span>Statistical approach</span><strong>Within-subjects, counterbalanced</strong></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 02 — Research Standards             -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s_standards" class="section">
+      <div class="section-header">
+        <span class="section-number">02</span>
+        <h2>International Research Standards</h2>
+        <p class="section-desc">Formal hypothesis testing with standardized effect size measurement and statistical significance thresholds.</p>
+      </div>
+      <div class="card-grid two-col">
+        <div class="glass info-card">
+          <span class="tag tag-auto">H₁: Speed Enhancement</span>
+          <h3>LLM-powered autocomplete significantly accelerates task completion speed relative to a baseline control condition.</h3>
+          <p>Autocomplete users implemented substantially more requirements within the fixed time window, demonstrating that inline AI code suggestions meaningfully enhance development velocity.</p>
+          <div class="metric-row">
+            <div class="metric">
+              <span class="metric-label">Effect Size</span>
+              <span class="metric-value">Cohen's d = 1.25 (Large)</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Significance</span>
+              <span class="metric-value">p &lt; 0.01 ✓</span>
+            </div>
+          </div>
+        </div>
+        <div class="glass info-card">
+          <span class="tag tag-control">H₂: Quality Maintenance</span>
+          <h3>AI-assisted code generation preserves comparable levels of maintainability to manually written code.</h3>
+          <p>Maintainability Index scores across all three conditions show negligible variation, confirming that AI tools augment speed without compromising code structure or readability.</p>
+          <div class="metric-row">
+            <div class="metric">
+              <span class="metric-label">Effect Size</span>
+              <span class="metric-value muted">Cohen's d = 0.12 (Negligible)</span>
+            </div>
+            <div class="metric">
+              <span class="metric-label">Significance</span>
+              <span class="metric-value muted">p &gt; 0.05 ✗</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 03 — Demographics                   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s1" class="section">
+      <div class="section-header">
+        <span class="section-number">03</span>
+        <h2>Participant Demographics</h2>
+        <p class="section-desc">Participant pool composition across gender, education, age distribution, and prior technical experience levels (N = 24 valid participants).</p>
+      </div>
+      <div class="card-grid three-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Gender Distribution</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartGender')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartGender"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Education Level</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartEducation')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartEducation"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Age Distribution</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartAge')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartAge"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid three-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Mean Experience Levels</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartExperience')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartExperience"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Programming Experience Distribution</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartProgExpDist')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartProgExpDist"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Tool Familiarity Overview</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartToolFamiliarity')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartToolFamiliarity"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 04 — Speed Metrics                  -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s2" class="section">
+      <div class="section-header">
+        <span class="section-number">04</span>
+        <h2>Speed &amp; Productivity Metrics</h2>
+        <p class="section-desc">Task completion velocity measured by requirements successfully implemented within the fixed time window across control, autocomplete, and conversational AI conditions.</p>
+      </div>
+      <div class="card-grid two-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Mean Speed by Condition</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartSpeedCondition')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartSpeedCondition"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Speed Distribution (Box Plot)</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartSpeedBox')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartSpeedBox"></canvas></div>
+        </div>
+      </div>
+      <p class="stat-annotation">Statistical significance: Autocomplete vs Control — Cohen's d = 1.25 (Large effect), p &lt; 0.01</p>
+      <div class="card-grid two-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Speed by Task × Condition</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartSpeedTaskCondition')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartSpeedTaskCondition"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Individual Participant Speeds</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartSpeedIndividual')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartSpeedIndividual"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 05 — Quality Metrics                -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s3" class="section">
+      <div class="section-header">
+        <span class="section-number">05</span>
+        <h2>Code Quality Assessment</h2>
+        <p class="section-desc">Multi-dimensional code quality evaluation through correctness of implementations, Maintainability Index (MI) scores, and implementation accuracy ratios across all experimental conditions.</p>
+      </div>
+      <div class="card-grid three-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Correctly Implemented Requirements</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartQualityCorrect')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartQualityCorrect"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Maintainability Index</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartMaintainability')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartMaintainability"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Implementation Accuracy</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartAccuracy')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartAccuracy"></canvas></div>
+        </div>
+      </div>
+      <p class="stat-annotation">Maintainability across conditions shows negligible effect size (Cohen's d = 0.12, p &gt; 0.05), confirming AI assistance does not degrade code quality.</p>
+      <div class="card-grid one-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Quality Metrics by Task × Condition</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartQualityTask')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container wide"><canvas id="chartQualityTask"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 06 — Activity & Communication       -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s4" class="section">
+      <div class="section-header">
+        <span class="section-number">06</span>
+        <h2>Activity &amp; Communication Patterns</h2>
+        <p class="section-desc">Output volume patterns and interaction behaviors including character output, AI communication volume, browser search dependency, and code snippet characteristics across conditions.</p>
+      </div>
+      <div class="card-grid two-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Overall Activity Volume</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartActivity')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartActivity"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Activity Distribution per Participant</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartActivityDist')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartActivityDist"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid four-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>AI Communication Volume</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartCommAI')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container small"><canvas id="chartCommAI"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Browser vs AI Usage</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartCommBrowserVsAI')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container small"><canvas id="chartCommBrowserVsAI"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>AI Snippet Count</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartCommSnippets')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container small"><canvas id="chartCommSnippets"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Mean Snippet Size</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartCommSnippetSize')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container small"><canvas id="chartCommSnippetSize"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 07 — User Experience                -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s5" class="section">
+      <div class="section-header">
+        <span class="section-number">07</span>
+        <h2>User Experience Assessment</h2>
+        <p class="section-desc">Self-reported ratings across satisfaction, perceived speed, perceived quality, IDE support effectiveness, and a comprehensive 10-dimension UX semantic differential assessment.</p>
+      </div>
+      <div class="card-grid three-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Overall Satisfaction</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartSatisfaction')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartSatisfaction"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Perceived Speed</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartPerceivedSpeed')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartPerceivedSpeed"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Perceived Quality</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartPerceivedQuality')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartPerceivedQuality"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid two-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>IDE Support Rating</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartIDESupport')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartIDESupport"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>IDE Understanding</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartIDEUnderstanding')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartIDEUnderstanding"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid one-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>10-Dimension UX Radar</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartUXRadar')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container wide"><canvas id="chartUXRadar"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 08 — Code Output                    -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s6" class="section">
+      <div class="section-header">
+        <span class="section-number">08</span>
+        <h2>Code Output Analysis</h2>
+        <p class="section-desc">Quantitative analysis of produced code including lines of code volume, comment density, code-to-comment ratios, and per-task character output volumes across all three conditions.</p>
+      </div>
+      <div class="card-grid three-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Lines of Code</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartLOC')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartLOC"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Comment Lines</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartComments')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartComments"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Code-to-Comment Ratio</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartCodeCommentRatio')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartCodeCommentRatio"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid one-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Output Volume per Task × Condition</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartCodePerTask')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container wide"><canvas id="chartCodePerTask"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 09 — Correlations                   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s7" class="section">
+      <div class="section-header">
+        <span class="section-number">09</span>
+        <h2>Correlations &amp; Multi-Dimensional Analysis</h2>
+        <p class="section-desc">Statistical relationships between experience, performance, and perception variables. Includes Pearson correlation analysis, scatter plots, and normalized multi-dimensional radar comparison.</p>
+      </div>
+      <div class="card-grid two-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Experience vs Speed</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartExpVsSpeed')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartExpVsSpeed"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Speed vs Code Quality</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartSpeedVsQuality')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartSpeedVsQuality"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Activity vs Code Quality</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartActivityVsQuality')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartActivityVsQuality"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Perceived vs Actual Performance</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartPerceivedVsActual')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartPerceivedVsActual"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid one-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Correlation Heatmap Matrix</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartHeatmap')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container wide"><canvas id="chartHeatmap"></canvas></div>
+        </div>
+      </div>
+      <div class="card-grid one-col stack-lg">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Overall Condition Comparison Radar</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartOverallRadar')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container wide"><canvas id="chartOverallRadar"></canvas></div>
+          <p class="stat-annotation" style="margin-top:0.5rem;">All metrics normalized to a 0–100 scale for cross-dimensional comparison.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 10 — Qualitative Analysis           -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s8" class="section">
+      <div class="section-header">
+        <span class="section-number">10</span>
+        <h2>Qualitative Thematic Analysis</h2>
+        <p class="section-desc">Systematic thematic analysis of participant open-ended responses, categorized into positive and negative sentiment themes with representative verbatim quotes from the study.</p>
+      </div>
+      <div class="card-grid two-col">
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Positive Feedback Themes</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartPositiveThemes')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartPositiveThemes"></canvas></div>
+        </div>
+        <div class="glass chart-card">
+          <div class="chart-card-header">
+            <h3>Negative Feedback Themes</h3>
+            <button class="chart-download-btn" onclick="downloadChartAsImage('chartNegativeThemes')" title="Download as PNG" aria-label="Download chart"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+          </div>
+          <div class="chart-container"><canvas id="chartNegativeThemes"></canvas></div>
+        </div>
+      </div>
+      <div class="stack-lg">
+        <h3 class="subhead">Key Research Findings</h3>
+        <div id="findingsGrid" class="findings-grid"></div>
+      </div>
+      <div class="stack-lg">
+        <h3 class="subhead">Participant Voices</h3>
+        <div id="feedbackQuotes" class="feedback-quotes"></div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════ -->
+    <!-- SECTION 11 — Project Team                   -->
+    <!-- ═══════════════════════════════════════════ -->
+    <section id="s_team" class="section">
+      <div class="section-header">
+        <span class="section-number">11</span>
+        <h2>Project Team</h2>
+        <p class="section-desc">Principal investigators and contributors to this research study at the University of Management and Technology.</p>
+      </div>
+      <div class="card-grid two-col">
+        <div class="glass info-card team-card">
+          <img class="team-avatar" src="assets/M.Zain.jpeg" alt="Muhammad Zain" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2UyZThmMCIgcng9IjYwIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjQwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+TVo8L3RleHQ+PC9zdmc+'">
+          <h3>Muhammad Zain</h3>
+          <p>Student ID: F2023266257</p>
+        </div>
+        <div class="glass info-card team-card">
+          <img class="team-avatar" src="assets/M.Umar.jpeg" alt="Muhammad Umar" loading="lazy" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iMTIwIj48cmVjdCB3aWR0aD0iMTIwIiBoZWlnaHQ9IjEyMCIgZmlsbD0iI2UyZThmMCIgcng9IjYwIi8+PHRleHQgeD0iNjAiIHk9IjcyIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSIjNjQ3NDhiIiBmb250LXNpemU9IjQwIiBmb250LWZhbWlseT0ic2Fucy1zZXJpZiI+TVU8L3RleHQ+PC9zdmc+'">
+          <h3>Muhammad Umar</h3>
+          <p>Student ID: F20232661022</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <p>LLM Programming Productivity Study — EICS 2024</p>
+    <p class="footer-sub">CS326 Human Computer Interaction • University of Management and Technology</p>
+    <p class="footer-sub">Last updated: June 4, 2026</p>
+  </footer>
+
+  <button class="back-to-top" id="backToTop" aria-label="Back to top" title="Back to top">
+    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"/></svg>
+  </button>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js"></script>
+  <script src="data.js"></script>
+  <script src="charts.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+activityCharacterOutput: 1273 
+communicationBrowserNewSnippets: 0 
+communicationBrowserSnippetSize: 0 
+communicationBrowserCharacters: 0 
+communcationAINewSnippets: 29 
+communicationAISnippetSize: 34.689655172413794 
+communicationAICharacters: 1006 
+
+		

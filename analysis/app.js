@@ -1,0 +1,401 @@
+/* ============================================================
+   app.js — LLM Productivity Research Dashboard
+   Complete interactivity layer
+   ============================================================ */
+
+// Note: mean(), median(), std(), quartiles(), correlationPearson(),
+// getConditionMetrics(), getConditionTaskMetrics() are defined in data.js
+
+// ────────────────────────────────────────────────────────────
+// 2. Counter Animations
+// ────────────────────────────────────────────────────────────
+function animateCounter(id, target, duration) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    let start = 0;
+    const increment = target / (duration / 16);
+    const timer = setInterval(() => {
+        start += increment;
+        if (start >= target) {
+            start = target;
+            clearInterval(timer);
+        }
+        el.textContent = Math.floor(start);
+    }, 16);
+}
+
+// ────────────────────────────────────────────────────────────
+// 3. Scroll-Triggered Fade Animations
+// ────────────────────────────────────────────────────────────
+function setupScrollAnimations() {
+    try {
+        const targets = document.querySelectorAll(
+            '.section, .chart-card, .info-card, .finding-card, .quote-card'
+        );
+        if (!targets.length) return;
+
+        targets.forEach(el => el.classList.add('fade-in-section'));
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target); // animate once
+                    }
+                });
+            },
+            { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+        );
+
+        targets.forEach(el => observer.observe(el));
+    } catch (err) {
+        console.warn('setupScrollAnimations:', err);
+    }
+}
+
+// ────────────────────────────────────────────────────────────
+// 4. Sticky Nav Active Highlight + Deep Linking
+// ────────────────────────────────────────────────────────────
+function setupNavHighlight() {
+    try {
+        const nav = document.getElementById('stickyNav');
+        const links = document.querySelectorAll('.nav-link[data-section]');
+        if (!links.length) return;
+
+        const OFFSET = 120; // px from top to consider "active"
+
+        function updateActiveLink() {
+            const scrollY = window.scrollY;
+
+            // Toggle .scrolled on nav
+            if (nav) {
+                nav.classList.toggle('scrolled', scrollY > 100);
+            }
+
+            let currentId = '';
+
+            links.forEach(link => {
+                const sectionId = link.getAttribute('data-section');
+                const section = document.getElementById(sectionId);
+                if (!section) return;
+
+                const sectionTop = section.offsetTop - OFFSET;
+                if (scrollY >= sectionTop) {
+                    currentId = sectionId;
+                }
+            });
+
+            links.forEach(link => {
+                const isActive = link.getAttribute('data-section') === currentId;
+                link.classList.toggle('active', isActive);
+            });
+
+            // Update URL hash silently for deep linking
+            if (currentId) {
+                history.replaceState(null, '', '#' + currentId);
+            } else {
+                history.replaceState(null, '', window.location.pathname);
+            }
+        }
+
+        window.addEventListener('scroll', updateActiveLink, { passive: true });
+        updateActiveLink(); // run once on load
+    } catch (err) {
+        console.warn('setupNavHighlight:', err);
+    }
+}
+
+// ────────────────────────────────────────────────────────────
+// 5. Mobile Hamburger Menu
+// ────────────────────────────────────────────────────────────
+function setupHamburger() {
+    const btn = document.getElementById('hamburgerBtn');
+    const navLinks = document.getElementById('navLinks');
+    if (!btn || !navLinks) return;
+
+    btn.addEventListener('click', () => {
+        const isOpen = navLinks.classList.toggle('mobile-open');
+        btn.classList.toggle('active', isOpen);
+        btn.setAttribute('aria-expanded', isOpen);
+    });
+
+    // Close menu when a link is clicked
+    navLinks.querySelectorAll('.nav-link').forEach(link => {
+        link.addEventListener('click', () => {
+            navLinks.classList.remove('mobile-open');
+            btn.classList.remove('active');
+            btn.setAttribute('aria-expanded', 'false');
+        });
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 6. Dark Mode Toggle
+// ────────────────────────────────────────────────────────────
+function setupThemeToggle() {
+    const toggle = document.getElementById('themeToggle');
+    if (!toggle) return;
+
+    // Check saved preference or system preference
+    const savedTheme = localStorage.getItem('theme');
+    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', initialTheme);
+
+    toggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme');
+        const next = current === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 7. Reading Progress Bar
+// ────────────────────────────────────────────────────────────
+function setupProgressBar() {
+    const bar = document.getElementById('progressBar');
+    if (!bar) return;
+
+    window.addEventListener('scroll', () => {
+        const winScroll = document.documentElement.scrollTop;
+        const height =
+            document.documentElement.scrollHeight -
+            document.documentElement.clientHeight;
+        const scrolled = height > 0 ? (winScroll / height) * 100 : 0;
+        bar.style.width = scrolled + '%';
+    }, { passive: true });
+}
+
+// ────────────────────────────────────────────────────────────
+// 8. Back to Top Button
+// ────────────────────────────────────────────────────────────
+function setupBackToTop() {
+    const btn = document.getElementById('backToTop');
+    if (!btn) return;
+
+    window.addEventListener('scroll', () => {
+        btn.classList.toggle('visible', window.scrollY > 500);
+    }, { passive: true });
+
+    btn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+}
+
+// ────────────────────────────────────────────────────────────
+// 9. Populate Key Findings Grid
+// ────────────────────────────────────────────────────────────
+function populateFindings() {
+    const grid = document.getElementById('findingsGrid');
+    if (!grid) return;
+
+    try {
+        const ctrl = getConditionMetrics('control');
+        const auto = getConditionMetrics('autocomplete');
+        const conv = getConditionMetrics('conversational');
+
+        const findings = [
+            {
+                type: 'positive',
+                title: 'AI Dramatically Boosts Implementation Speed',
+                text: `Autocomplete users completed ${mean(auto.speedReq).toFixed(1)} requirements on average versus ${mean(ctrl.speedReq).toFixed(1)} for control — a ${((mean(auto.speedReq) - mean(ctrl.speedReq)) / mean(ctrl.speedReq) * 100).toFixed(0)}% productivity gain with large statistical significance (Cohen\u2019s d = 1.25, p < 0.01).`
+            },
+            {
+                type: 'positive',
+                title: 'Conversational AI Enables Learning-by-Doing',
+                text: `Participants reported the highest satisfaction scores with conversational AI (${mean(DATA.surveyRatings.conversational.satisfaction).toFixed(0)}/100), particularly valuing it as a learning tool for unfamiliar programming concepts and syntax.`
+            },
+            {
+                type: 'neutral',
+                title: 'Code Quality Remains Stable Across All Conditions',
+                text: `Maintainability Index scores show negligible variation: Control ${mean(ctrl.qualityMI).toFixed(1)}, Autocomplete ${mean(auto.qualityMI).toFixed(1)}, Conversational ${mean(conv.qualityMI).toFixed(1)}. Effect size is negligible (d = 0.12, p > 0.05), confirming AI tools do not degrade code quality.`
+            },
+            {
+                type: 'positive',
+                title: 'Autocomplete Generates Substantially More Code',
+                text: `Mean lines of code: Autocomplete ${mean(DATA.code.autocomplete.code).toFixed(0)} vs Control ${mean(DATA.code.control.code).toFixed(0)}. AI-assisted conditions consistently produced more complete, functional implementations within the same time constraints.`
+            },
+            {
+                type: 'negative',
+                title: 'Conversational AI Verbosity Proves Problematic',
+                text: `Eight participants explicitly noted verbosity issues with conversational AI. Mean snippet size was ${mean(conv.aiSnippetSize).toFixed(0)} characters versus ${mean(auto.aiSnippetSize).toFixed(0)} for autocomplete — a ${((mean(conv.aiSnippetSize) - mean(auto.aiSnippetSize)) / mean(auto.aiSnippetSize) * 100).toFixed(0)}% increase that participants found overwhelming.`
+            },
+            {
+                type: 'neutral',
+                title: 'Speed\u2013Understanding Trade-off Emerges',
+                text: `While AI dramatically improved task completion speed, several participants reported diminished code comprehension. Four autocomplete users noted they couldn\u2019t fully explain the generated code — highlighting an important pedagogical consideration.`
+            },
+            {
+                type: 'positive',
+                title: 'AI Eliminates External Search Dependency',
+                text: `Control participants relied heavily on browser searches (avg ${mean(ctrl.browserChars).toFixed(0)} chars), while AI-assisted conditions showed near-zero browser usage — indicating that AI tools effectively replace Google/Stack Overflow workflows.`
+            },
+            {
+                type: 'negative',
+                title: 'Control Condition Generates Significant Frustration',
+                text: `Control satisfaction scored only ${mean(DATA.surveyRatings.control.satisfaction).toFixed(0)}/100 — substantially below both Autocomplete (${mean(DATA.surveyRatings.autocomplete.satisfaction).toFixed(0)}/100) and Conversational (${mean(DATA.surveyRatings.conversational.satisfaction).toFixed(0)}/100). Multiple participants described the experience as \u201chindering\u201d and \u201cfrustrating.\u201d`
+            }
+        ];
+
+        findings.forEach(f => {
+            const card = document.createElement('div');
+            card.className = `finding-card ${f.type}`;
+            card.innerHTML = `<h4>${f.title}</h4><p>${f.text}</p>`;
+            grid.appendChild(card);
+        });
+    } catch (err) {
+        console.warn('populateFindings:', err);
+    }
+}
+
+// ────────────────────────────────────────────────────────────
+// 10. Populate Feedback Quotes
+// ────────────────────────────────────────────────────────────
+function populateQuotes() {
+    const container = document.getElementById('quotesGrid');
+    if (!container) return;
+
+    try {
+        const quotes = [
+            {
+                text: 'By suggesting to use functions I did not even know existed...',
+                participant: 'Bonobo',
+                condition: 'auto',
+                label: 'Autocomplete'
+            },
+            {
+                text: 'It basically solved the task for me. Only basic coding knowledge required.',
+                participant: 'Macaw',
+                condition: 'conv',
+                label: 'Conversational'
+            },
+            {
+                text: 'Without any suggestions and autocompletion it is way harder to code...',
+                participant: 'Collie',
+                condition: 'control',
+                label: 'Control'
+            },
+            {
+                text: 'Writing short comments and letting them autocomplete is super fast...',
+                participant: 'Jellyfish',
+                condition: 'auto',
+                label: 'Autocomplete'
+            },
+            {
+                text: 'If there was not any sort of an assistant, I could have not solved the task...',
+                participant: 'Elephant',
+                condition: 'conv',
+                label: 'Conversational'
+            },
+            {
+                text: 'I often had to type things twice. Even though I spent 1 minute writing prompts...',
+                participant: 'Ocelot',
+                condition: 'conv',
+                label: 'Conversational'
+            },
+            {
+                text: 'The AI assistant was able to complete all requirements when giving simply high level guidance...',
+                participant: 'Jellyfish',
+                condition: 'conv',
+                label: 'Conversational'
+            },
+            {
+                text: 'I immediately opted to use Genie for every question I did not DIRECTLY know the answer to...',
+                participant: 'Hamster',
+                condition: 'conv',
+                label: 'Conversational'
+            },
+            {
+                text: "It improved my productivity but I didn't understand what code was being created...",
+                participant: 'Flamingo',
+                condition: 'auto',
+                label: 'Autocomplete'
+            },
+            {
+                text: 'YES - it saved me massive time to look up concepts...',
+                participant: 'Bison',
+                condition: 'conv',
+                label: 'Conversational'
+            },
+            {
+                text: 'The IDE did not improve my productivity...',
+                participant: 'Bison',
+                condition: 'control',
+                label: 'Control'
+            },
+            {
+                text: "It's better than googling, but the AI assistant provides too much blabla...",
+                participant: 'Badger',
+                condition: 'conv',
+                label: 'Conversational'
+            }
+        ];
+
+        quotes.forEach(q => {
+            const card = document.createElement('div');
+            card.className = 'quote-card';
+            card.innerHTML = `
+                <blockquote>${q.text}</blockquote>
+                <div class="quote-source">
+                    &mdash; ${q.participant}
+                    <span class="badge-inline badge-${q.condition}">${q.label}</span>
+                </div>`;
+            container.appendChild(card);
+        });
+
+        // Observe newly created quote cards for fade-in animation
+        const observer = new IntersectionObserver(
+            (entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            },
+            { threshold: 0.08, rootMargin: '0px 0px -40px 0px' }
+        );
+
+        container.querySelectorAll('.quote-card').forEach(card => {
+            card.classList.add('fade-in-section');
+            observer.observe(card);
+        });
+    } catch (err) {
+        console.warn('populateQuotes:', err);
+    }
+}
+
+// ────────────────────────────────────────────────────────────
+// 11. DOMContentLoaded — master initialisation
+// ────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+    setupThemeToggle();
+
+    // Counter animations
+    animateCounter('animParticipants', 24, 1500);
+    animateCounter('animTasks', 3, 800);
+    animateCounter('animConditions', 3, 800);
+    animateCounter('animDimensions', 10, 1200);
+
+    // Charts (defined in charts.js)
+    if (typeof initCharts === 'function') {
+        try {
+            initCharts();
+        } catch (err) {
+            console.warn('initCharts:', err);
+        }
+    }
+
+    // Dynamic content
+    populateFindings();
+    populateQuotes();
+
+    // UX enhancements
+    setupScrollAnimations();
+    setupNavHighlight();
+    setupHamburger();
+    setupProgressBar();
+    setupBackToTop();
+});
