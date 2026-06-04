@@ -650,10 +650,10 @@ function setupChartFullscreen() {
         }
     });
 
-    // Add hint text
-    document.querySelectorAll('.chart-container').forEach(container => {
-        container.setAttribute('title', 'Double-click to fullscreen');
-    });
+    // Add hint text (Commented out to prevent native browser tooltip from blocking Chart.js tooltips)
+    // document.querySelectorAll('.chart-container').forEach(container => {
+    //     container.setAttribute('title', 'Double-click to fullscreen');
+    // });
 }
 
 // ────────────────────────────────────────────────────────────
