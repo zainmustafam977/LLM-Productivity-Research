@@ -883,16 +883,17 @@ main {
 
 .chart-container {
   position: relative;
-  height: 320px;
+  min-height: 380px;
+  height: auto;
   width: 100%;
   background: var(--chart-bg);
   border-radius: var(--card-radius-sm);
 }
 .chart-container.small {
-  height: 260px;
+  min-height: 320px;
 }
 .chart-container.wide {
-  height: 420px;
+  min-height: 460px;
 }
 
 .chart-container canvas {
@@ -1649,10 +1650,10 @@ main {
     padding: 1.25rem;
   }
   .chart-container {
-    height: 280px;
+    min-height: 320px;
   }
   .chart-container.wide {
-    height: 340px;
+    min-height: 400px;
   }
 
   /* Section */
@@ -1731,8 +1732,8 @@ main {
 
   .info-card { padding: 1.25rem; }
   .chart-card { padding: 1rem; }
-  .chart-container { height: 240px; }
-  .chart-container.wide { height: 300px; }
+  .chart-container { min-height: 300px; }
+  .chart-container.wide { min-height: 360px; }
 
   .finding-card {
     padding: 1.25rem 1.25rem 1.25rem 1.5rem;

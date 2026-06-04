@@ -635,6 +635,8 @@ function setupChartFullscreen() {
                 card.classList.add('chart-fullscreen');
                 document.body.style.overflow = 'hidden';
             }
+            // Dispatch resize to trigger Chart.js internal resize listener
+            window.dispatchEvent(new Event('resize'));
         });
     });
 

@@ -63,12 +63,24 @@ function baseBarOptions(opts = {}) {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 800, easing: 'easeOutQuart' },
+        transitions: { active: { animation: { duration: 300 } } },
         interaction: {
             mode: 'index',
-            intersect: false
+            intersect: false,
+            axis: 'x'
+        },
+        onClick: (event, elements, chart) => {
+            if(elements.length > 0) {
+                console.log('Data point clicked:', elements[0]);
+                alert('Data node selected. Check console for payload.');
+            }
         },
         plugins: {
-            legend: opts.legend !== undefined ? opts.legend : { display: true, position: 'bottom' },
+            legend: opts.legend !== undefined ? opts.legend : { 
+                display: true, 
+                position: 'bottom',
+                onClick: Chart.defaults.plugins.legend.onClick // explicitly ensure native toggling
+            },
             tooltip: {
                 backgroundColor: 'rgba(15, 23, 42, 0.92)',
                 titleFont: { weight: '600', size: 13 },
@@ -116,12 +128,23 @@ function radarOptions(max, stepSize, subtitle) {
         responsive: true,
         maintainAspectRatio: false,
         animation: { duration: 800, easing: 'easeOutQuart' },
+        transitions: { active: { animation: { duration: 300 } } },
+        layout: { padding: { top: 10, bottom: 20 } },
         interaction: {
             mode: 'index',
             intersect: false
         },
+        onClick: (event, elements, chart) => {
+            if(elements.length > 0) {
+                console.log('Data point clicked:', elements[0]);
+                alert('Data node selected. Check console for payload.');
+            }
+        },
         plugins: {
-            legend: { position: 'bottom' },
+            legend: { 
+                position: 'bottom',
+                onClick: Chart.defaults.plugins.legend.onClick
+            },
             tooltip: {
                 backgroundColor: 'rgba(15, 23, 42, 0.92)',
                 titleFont: { weight: '600', size: 13 },
